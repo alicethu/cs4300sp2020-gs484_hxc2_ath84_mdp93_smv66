@@ -95,7 +95,6 @@ def combine_AND_boolean_terms(terms, inverted_index):
     # most efficient run-time, order by number of postings ascending
     terms_in_order = [k for k in sorted(term_to_postings, key=lambda k: len(term_to_postings[k]), reverse=False)] 
     postings = term_to_postings[terms_in_order[0]]
-    if len(terms_in_order) == 2:
     for i in range(1, len(terms_in_order)):
         postings = merge_postings_ANDAND(postings,term_to_postings[terms_in_order[i]])
     return postings
