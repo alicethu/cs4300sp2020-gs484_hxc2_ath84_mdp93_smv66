@@ -96,10 +96,8 @@ def combine_AND_boolean_terms(terms, inverted_index):
     terms_in_order = [k for k in sorted(term_to_postings, key=lambda k: len(term_to_postings[k]), reverse=False)] 
     postings = term_to_postings[terms_in_order[0]]
     if len(terms_in_order) == 2:
-        print(term_to_postings)
     for i in range(1, len(terms_in_order)):
         postings = merge_postings_ANDAND(postings,term_to_postings[terms_in_order[i]])
-        # print(postings)
     return postings
 
 
@@ -458,12 +456,16 @@ def version_2_search(query_words, omit_words, recipes):
         inv_idx_ingredients = build_inverted_index(recipes_out, "ingredients")
         inv_idx_title = build_inverted_index(recipes_out, "title")
         ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_title, recipes_out)
-        if len(ranked_results) == 0:
-            ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_ingredients, recipes_out)
-            if len(ranked_results) == 0:
+        if len(ranked_results) < 10:
+            ranked_ingredient_results = rank_recipes_boolean(query_words, omit_words, inv_idx_ingredients, recipes_out)
+            if len(ranked_ingredient_results) == 0:
                 all_data = []
             else:
-                all_data = ranked_results[:10]
+                i = 0
+                while len(ranked_results) < 10 and i < len(ranked_ingredient_results):
+                    ranked_results.append(ranked_ingredient_results[i])
+                    i += 1
+                all_data = ranked_results
         else:
             all_data = ranked_results[:10]
     return all_data
