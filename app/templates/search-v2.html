@@ -230,16 +230,16 @@
           <p><i>{{breakfast_data[i]["description"]}}</i></p>
           {% endif %}
           {% if breakfast_data[i]["calories"] is not none %}
-          <p><strong>Calories:</strong> {{breakfast_data[i]["calories"]}}</p>
+          <p><strong>Calories:</strong> {{breakfast_data[i]["calories"] | int}}</p>
           {% endif %}
           {% if breakfast_data[i]["fat"] is not none %}
-          <p><strong>Fat:</strong> {{breakfast_data[i]["fat"]}} g</p>
+          <p><strong>Fat:</strong> {{breakfast_data[i]["fat"] | int}}g</p>
           {% endif %}
           {% if breakfast_data[i]["protein"] is not none %}
-          <p><strong>Protein:</strong> {{breakfast_data[i]["protein"]}} g</p>
+          <p><strong>Protein:</strong> {{breakfast_data[i]["protein"] | int}}g</p>
           {% endif %}
           {% if breakfast_data[i]["sodium"] is not none %}
-          <p><strong>Sodium:</strong> {{breakfast_data[i]["sodium"]}} mg</p>
+          <p><strong>Sodium:</strong> {{breakfast_data[i]["sodium"] | int}}mg</p>
           {% endif %}
           {% if breakfast_data[i]["rating"] is not none %}
           <p>
@@ -268,16 +268,16 @@
           <p><i>{{lunch_data[i]["description"]}}</i></p>
           {% endif %}
           {% if lunch_data[i]["calories"] is not none %}
-          <p><strong>Calories:</strong> {{lunch_data[i]["calories"]}}</p>
+          <p><strong>Calories:</strong> {{lunch_data[i]["calories"] | int}}</p>
           {% endif %}
           {% if lunch_data[i]["fat"] is not none %}
-          <p><strong>Fat:</strong> {{lunch_data[i]["fat"]}} g</p>
+          <p><strong>Fat:</strong> {{lunch_data[i]["fat"] | int}}g</p>
           {% endif %}
           {% if lunch_data[i]["protein"] is not none %}
-          <p><strong>Protein:</strong> {{lunch_data[i]["protein"]}} g</p>
+          <p><strong>Protein:</strong> {{lunch_data[i]["protein"] | int}}g</p>
           {% endif %}
           {% if lunch_data[i]["sodium"] is not none %}
-          <p><strong>Sodium:</strong> {{lunch_data[i]["sodium"]}} mg</p>
+          <p><strong>Sodium:</strong> {{lunch_data[i]["sodium"] | int}}mg</p>
           {% endif %}
           {% if lunch_data[i]["rating"] is not none %}
           <p>
@@ -306,16 +306,16 @@
           <p><i>{{dinner_data[i]["description"]}}</i></p>
           {% endif %}
           {% if dinner_data[i]["calories"] is not none %}
-          <p><strong>Calories:</strong> {{dinner_data[i]["calories"]}}</p>
+          <p><strong>Calories:</strong> {{dinner_data[i]["calories"] | int}}</p>
           {% endif %}
           {% if dinner_data[i]["fat"] is not none %}
-          <p><strong>Fat:</strong> {{dinner_data[i]["fat"]}} g</p>
+          <p><strong>Fat:</strong> {{dinner_data[i]["fat"] | int}}g</p>
           {% endif %}
           {% if dinner_data[i]["protein"] is not none %}
-          <p><strong>Protein:</strong> {{dinner_data[i]["protein"]}} g</p>
+          <p><strong>Protein:</strong> {{dinner_data[i]["protein"] | int}}g</p>
           {% endif %}
           {% if dinner_data[i]["sodium"] is not none %}
-          <p><strong>Sodium:</strong> {{dinner_data[i]["sodium"]}} mg</p>
+          <p><strong>Sodium:</strong> {{dinner_data[i]["sodium"] | int}}mg</p>
           {% endif %}
           {% if dinner_data[i]["rating"] is not none %}
           <p>

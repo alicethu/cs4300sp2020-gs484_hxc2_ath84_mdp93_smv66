@@ -457,9 +457,9 @@ def version_2_search(query_words, omit_words, recipes):
         recipes_out = recipe_schema.dump(recipes)
         inv_idx_ingredients = build_inverted_index(recipes_out, "ingredients")
         inv_idx_title = build_inverted_index(recipes_out, "title")
-        ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_ingredients, recipes_out)
+        ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_title, recipes_out)
         if len(ranked_results) == 0:
-            ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_title, recipes_out)
+            ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_ingredients, recipes_out)
             if len(ranked_results) == 0:
                 all_data = []
             else:
@@ -482,15 +482,18 @@ def search():
     dinner_selected = request.args.get('dinner')
     drink_included = request.args.get('include-drink')
 
+    # if calorie limit is not provided, the limit is set to maximum number of
+    # calories for any recipe in the database, so that all recipes are allowed
     if not cal_limit:
-        cal_limit = db.session.query(func.max(Recipe.calories)).one()
+        cal_limit = int(db.session.query(func.max(Recipe.calories)).one()[0])
 
-    # default initialization
+    # default initialization of output
     output_message = ''
     breakfast_data = None
     lunch_data = None
     dinner_data = None
 
+    # rendering template for Prototype 1
     if version is not None and int(version) == 1:
         output_message, data = version_1_search(query, output_message, [])
         return render_template('search-v1.html', name=project_name, netid=net_ids, output_message=output_message, data=data)
@@ -501,19 +504,21 @@ def search():
             # basic query cleaning/splitting 
             # (TODO: data validation to check SQL injection and possibly input type)
             fav_foods = fav_foods.lower()
-            query_words = fav_foods.split(",")
+            query_words = fav_foods.split(",") # accounting for comma-separated queries
             query_words = [word.strip() for word in query_words]
             if len(query_words) == 1:
-                query_words = query_words[0].split(";")
-            # query_words = tokenize(fav_foods)
-            """
+                query_words = query_words[0].split(";") # accounting for semicolon-separated queries
+            
+            # list of query words, both in original form (as input by user) and capitalized
+            query_words_with_caps = []
             for word in query_words:
-                query_words.append(word.capitalize())
-            """
-            omit_words = omit_foods.split(",")
+                query_words_with_caps.append(word)
+                query_words_with_caps.append(word.capitalize())
+            
+            omit_words = omit_foods.split(",") # accounting for comma-separated queries
             omit_words = [word.strip() for word in omit_words]
             if len(omit_words) == 1:
-                omit_words = omit_words[0].split(";")
+                omit_words = omit_words[0].split(";") # accounting for semicolon-separated queries
 
             if breakfast_selected is None and lunch_selected is None and dinner_selected is None:
                 breakfast_selected = "on"
@@ -524,69 +529,69 @@ def search():
                 if drink_included:
                     breakfast_recipes = Recipe.query.filter(
                         or_(
-                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words),
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
                         )
-                    ).filter_by(calories<cal_limit).filter_by(meal_type="breakfast").all()
+                    ).filter(Recipe.calories <= cal_limit).filter_by(meal_type="breakfast").all()
                 else:
                     breakfast_recipes = Recipe.query.filter(
                         or_(
-                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words),
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
                         )
-                    ).filter(Recipe.calories < cal_limit).filter(~Recipe.categories.like("%Drink%")).filter_by(meal_type="breakfast").all()
+                    ).filter(Recipe.calories <= cal_limit).filter(~Recipe.categories.like("%Drink%")).filter_by(meal_type="breakfast").all()
                 breakfast_data = version_2_search(query_words, omit_words, breakfast_recipes)
             if lunch_selected:
                 lunch_recipes = None # placeholder initialization
                 if drink_included:
                     lunch_recipes = Recipe.query.filter(
                         or_(
-                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words),
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
                         )
-                    ).filter_by(meal_type="lunch").all()
+                    ).filter(Recipe.calories <= cal_limit).filter_by(meal_type="lunch").all()
                 else:
                     lunch_recipes = Recipe.query.filter(
                         or_(
-                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words),
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
                         )
-                    ).filter(~Recipe.categories.like("%Drink%")).filter_by(meal_type="lunch").all()
+                    ).filter(Recipe.calories <= cal_limit).filter(~Recipe.categories.like("%Drink%")).filter_by(meal_type="lunch").all()
                 lunch_data = version_2_search(query_words, omit_words, lunch_recipes)
             if dinner_selected:
                 dinner_recipes = None # placeholder initialization
                 if drink_included:
                     dinner_recipes = Recipe.query.filter(
                         or_(
-                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words),
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
                         )
-                    ).filter_by(meal_type="dinner").all()
+                    ).filter(Recipe.calories <= cal_limit).filter_by(meal_type="dinner").all()
                 else:
                     dinner_recipes = Recipe.query.filter(
                         or_(
-                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words),
-                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words),
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
+                            or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
                         )
-                    ).filter(~Recipe.categories.like("%Drink%")).filter_by(meal_type="dinner").all()
+                    ).filter(Recipe.calories <= cal_limit).filter(~Recipe.categories.like("%Drink%")).filter_by(meal_type="dinner").all()
                 dinner_data = version_2_search(query_words, omit_words, dinner_recipes)
             result_success = False
             for data in [breakfast_data, lunch_data, dinner_data]:
