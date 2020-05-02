@@ -93,6 +93,11 @@
       line-height: 0px;
     }
 
+    .fade {
+      padding: 20px;
+      /* center align??? */
+    }
+
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -108,12 +113,28 @@
       height: 95%;
     }
 
+    .modal-title {
+      font-size: 40px;
+    }
+
     .modal-header {
       background: rgb(181, 160, 139);
+      padding: 20px 100px;
     }
 
     .modal-body {
       background: rgb(237, 218, 199);
+      padding: 15px 100px;
+    }
+
+    .modal-body p,
+    .modal-body ul li,
+    .modal-body ol li {
+      font-size: 20px;
+    }
+
+    .modal-body ol li {
+      padding-bottom: 10px;
     }
 
     .modal-footer {
@@ -150,18 +171,20 @@
     -->
   <main>
     <form class="form-inline global-search">
-      <h1 style="font-size: 55px; font-family:Futura">
-        <span style="color: rgb(4, 70, 19);">S</span>
-        <span style="color: rgb(17, 80, 29);">M</span>
-        <span style="color: rgb(26, 87, 37);">A</span>
-        <span style="color: rgb(35, 99, 47);">R</span>
-        <span style="color: rgb(46, 110, 58);">T</span>
-        <span> 🔪 </span>
-        <span style="color: rgb(53, 121, 66);">C</span>
-        <span style="color: rgb(61, 121, 66);">H</span>
-        <span style="color: rgb(83, 131, 76);">E</span>
-        <span style="color: rgb(102, 151, 95);">F</span>
-      </h1>
+      <a href=search.html>
+        <h1 style="font-size: 55px; font-family:Futura">
+          <span style="color: rgb(4, 70, 19);">S</span>
+          <span style="color: rgb(17, 80, 29);">M</span>
+          <span style="color: rgb(26, 87, 37);">A</span>
+          <span style="color: rgb(35, 99, 47);">R</span>
+          <span style="color: rgb(46, 110, 58);">T</span>
+          <span> 🔪 </span>
+          <span style="color: rgb(53, 121, 66);">C</span>
+          <span style="color: rgb(61, 121, 66);">H</span>
+          <span style="color: rgb(83, 131, 76);">E</span>
+          <span style="color: rgb(102, 151, 95);">F</span>
+        </h1>
+      </a>
 
       <br><br>
 
@@ -175,13 +198,13 @@
       <div class="form-group">
         <label id="fav-input">Favorite foods: </label>
         <input id="fav-input" type="text" name="fav-foods" class="form-control form-text"
-          placeholder="e.g. 'watermelon, fish, cashews'">
+          placeholder="e.g. 'fish, cashews, garlic'">
       </div>
 
       <div class="form-group">
         <label id="res-input">Diet restrictions: </label>
         <input id="res-input" type="text" name="res-foods" class="form-control form-text"
-          placeholder="e.g. 'nuts, milk, shrimp'">
+          placeholder="e.g. 'milk, shrimp'">
       </div>
 
       <div class="form-group">
