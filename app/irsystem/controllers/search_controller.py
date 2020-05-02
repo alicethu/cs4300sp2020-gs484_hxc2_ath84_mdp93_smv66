@@ -504,6 +504,13 @@ def search():
             # list of query words, both in original form (as input by user) and capitalized
             query_words_with_caps = []
             for word in query_words:
+                multi_word_lst = word.split(" ")
+                multi_word = "" # placeholder initialization
+                if len(multi_word_lst) > 1:
+                    for w in multi_word_lst:
+                        multi_word += w.capitalize() + " "
+                if len(multi_word) > 0:
+                    query_words_with_caps.append(multi_word.strip())
                 query_words_with_caps.append(word)
                 query_words_with_caps.append(word.capitalize())
             

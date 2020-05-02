@@ -1,16 +1,14 @@
 from app import db
-from app.irsystem.models import (
-    Recipe, 
-    Category, 
-    RecipeCategorization
-)
+from app.irsystem.models import Recipe
 import json
 from app.testdata import data
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from app.irsystem.controllers.search_controller import tokenize
 import pandas as pd
 import numpy as np
 from sklearn import ensemble
+import re
 
 """
 Populate Postgres database with complete dataset, found in app/full_format_recipes.json.
@@ -256,3 +254,21 @@ def delimitDatabaseLists():
           recipe.categories = updated_categories
           db.session.flush()
           db.session.commit()
+
+"""
+Cleans data to remove dysfunctional Epicurious links.
+"""
+def filterLinks():
+  recipes_to_filter = Recipe.query.filter(
+    or_(
+      Recipe.description.like("%<epi%"),
+      Recipe.description.like("%</epi%")
+    )
+  ).all()
+  for r in recipes_to_filter:
+    desc = r.description
+    desc = re.sub(r"(</?epi:?recip?elink id=\"[0-9]*\"\"?>)|(<epi: ?recipeLink ?=\"[0-9]*\">)|(</epi:?recipe[lL]ink>)|(</epi:recipe>)|(<epi:recipe link=\"\" id=\"[0-9]*\">)|(epi:recipeLink=\"?[0-9]*\")|(epi:recipelinka?)|(<epi:recipeLink id ?\"[0-9]*\">)|(</a?>)|(<epi:recieplink id=\"[0-9]*\">)|(</epi:reciep?link>)|(</?[pP]>)|(< id=\"[0-9]* \">)|(<epirecipe:link id=\"[0-9]*\")|(</epirecipe:link>)", 
+      "", desc)
+    r.description = desc
+    db.session.flush()
+    db.session.commit()

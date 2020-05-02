@@ -423,6 +423,7 @@
           <div class="modal-body">
             {% if breakfast_item["description"] is not none %}
             <p>{{breakfast_item["description"]}}</p>
+            {% endif %}
             {% if breakfast_item["rating"] is not none %}
             <p>
               {% for i in range(breakfast_item["rating"] | int) %}
@@ -432,7 +433,6 @@
               &#9734
               {% endfor %}
             </p>
-            {% endif %}
             <br>
             {% endif %}
             {% if breakfast_item["calories"] is not none
@@ -503,6 +503,7 @@
           <div class="modal-body">
             {% if lunch_item["description"] is not none %}
             <p>{{lunch_item["description"]}}</p>
+            {% endif %}
             {% if lunch_item["rating"] is not none %}
             <p>
               {% for i in range(lunch_item["rating"] | int) %}
@@ -512,7 +513,6 @@
               &#9734
               {% endfor %}
             </p>
-            {% endif %}
             <br>
             {% endif %}
             {% if lunch_item["calories"] is not none
@@ -552,7 +552,11 @@
             {% set directions_lst = lunch_item["directions"].split(';;;') %}
             <ol>
               {% for j in range(directions_lst|length) %}
+              {% if ((j + 1) ~ ".") in directions_lst[j][:4] %}
+              <li>{{directions_lst[j][3:]}}</li>
+              {% else %}
               <li>{{directions_lst[j]}}</li>
+              {% endif %}
               {% endfor %}
             </ol>
             {% endif %}
@@ -579,6 +583,7 @@
           <div class="modal-body">
             {% if dinner_item["description"] is not none %}
             <p>{{dinner_item["description"]}}</p>
+            {% endif %}
             {% if dinner_item["rating"] is not none %}
             <p>
               {% for i in range(dinner_item["rating"] | int) %}
@@ -588,7 +593,6 @@
               &#9734
               {% endfor %}
             </p>
-            {% endif %}
             <br>
             {% endif %}
             {% if dinner_item["calories"] is not none
@@ -628,7 +632,11 @@
             {% set directions_lst = dinner_item["directions"].split(';;;') %}
             <ol>
               {% for j in range(directions_lst|length) %}
+              {% if ((j + 1) ~ ".") in directions_lst[j][:4] %}
+              <li>{{directions_lst[j][3:]}}</li>
+              {% else %}
               <li>{{directions_lst[j]}}</li>
+              {% endif %}
               {% endfor %}
             </ol>
             {% endif %}

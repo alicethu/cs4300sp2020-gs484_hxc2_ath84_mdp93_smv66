@@ -16,11 +16,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 # DB
 db = SQLAlchemy(app)
-# from .db_manage2 import populate_db, update_table, add_categorizations, delimitDatabaseLists
+# from .db_manage2 import populate_db, update_table, add_categorizations, delimitDatabaseLists, filterLinks
 # populate_db()
 # update_table()
 # add_categorizations()
 # delimitDatabaseLists()
+# filterLinks()
 
 # Import + Register Blueprints
 from app.accounts import accounts as accounts
