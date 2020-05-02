@@ -104,6 +104,7 @@
 
     .modal-lg {
       width: 93%;
+      height: 95%;
     }
 
     .modal-header {
@@ -116,6 +117,22 @@
 
     .modal-footer {
       background: rgb(237, 218, 199);
+    }
+
+    .modal-body-header {
+      line-height: 0%;
+    }
+
+    .underline {
+      line-height: 80%;
+    }
+
+    .btn:hover {
+      background-color: rgb(134, 182, 252);
+    }
+
+    .close {
+      font-size: 220%;
     }
   </style>
 </head>
@@ -364,23 +381,23 @@
           <div class="modal-body">
             {% if breakfast_item["description"] is not none %}
             <p>{{breakfast_item["description"]}}</p>
-            {% endif %}
-            {% if breakfast_item["ingredients"] is not none %}
-            {% set ingredients_lst = breakfast_item["ingredients"].split(';;;') %}
-            <ul>
-              {% for j in range(ingredients_lst|length) %}
-              <li>{{ingredients_lst[j]}}</li>
+            {% if breakfast_item["rating"] is not none %}
+            <p>
+              {% for i in range(breakfast_item["rating"] | int) %}
+              &#9733
               {% endfor %}
-            </ul>
-            {% endif %}
-            {% if breakfast_item["directions"] is not none %}
-            {% set directions_lst = breakfast_item["directions"].split(';;;') %}
-            <ol>
-              {% for j in range(directions_lst|length) %}
-              <li>{{directions_lst[j]}}</li>
+              {% for i in range(5 - breakfast_item["rating"] | int) %}
+              &#9734
               {% endfor %}
-            </ol>
+            </p>
             {% endif %}
+            <br>
+            {% endif %}
+            {% if breakfast_item["calories"] is not none
+            or breakfast_item["fat"] is not none or breakfast_item["protein"] 
+            is not none or breakfast_item["sodium"] is not none %}
+            <h3 class="modal-body-header">Nutritional Information</h3>
+            <p class="underline">____________________________________</p>
             {% if breakfast_item["calories"] is not none %}
             <p><strong>Calories:</strong> {{breakfast_item["calories"] | int}}</p>
             {% endif %}
@@ -393,15 +410,30 @@
             {% if breakfast_item["sodium"] is not none %}
             <p><strong>Sodium:</strong> {{breakfast_item["sodium"] | int}}mg</p>
             {% endif %}
-            {% if breakfast_item["rating"] is not none %}
-            <p>
-              {% for i in range(breakfast_item["rating"] | int) %}
-              &#9733
+            <br>
+            {% endif %}
+            {% if breakfast_item["ingredients"] is not none 
+            or breakfast_item["directions"] is not none %}
+            <h3 class="modal-body-header">Preparation</h3>
+            <p class="underline">_____________________</p>
+            {% if breakfast_item["ingredients"] is not none %}
+            <p><strong>Ingredients:</strong></p>
+            {% set ingredients_lst = breakfast_item["ingredients"].split(';;;') %}
+            <ul>
+              {% for j in range(ingredients_lst|length) %}
+              <li>{{ingredients_lst[j]}}</li>
               {% endfor %}
-              {% for i in range(5 - breakfast_item["rating"] | int) %}
-              &#9734
+            </ul>
+            {% endif %}
+            {% if breakfast_item["directions"] is not none %}
+            <p><strong>Directions:</strong></p>
+            {% set directions_lst = breakfast_item["directions"].split(';;;') %}
+            <ol>
+              {% for j in range(directions_lst|length) %}
+              <li>{{directions_lst[j]}}</li>
               {% endfor %}
-            </p>
+            </ol>
+            {% endif %}
             {% endif %}
           </div>
           <div class="modal-footer">
@@ -425,23 +457,23 @@
           <div class="modal-body">
             {% if lunch_item["description"] is not none %}
             <p>{{lunch_item["description"]}}</p>
-            {% endif %}
-            {% if lunch_item["ingredients"] is not none %}
-            {% set ingredients_lst = lunch_item["ingredients"].split(';;;') %}
-            <ul>
-              {% for j in range(ingredients_lst|length) %}
-              <li>{{ingredients_lst[j]}}</li>
+            {% if lunch_item["rating"] is not none %}
+            <p>
+              {% for i in range(lunch_item["rating"] | int) %}
+              &#9733
               {% endfor %}
-            </ul>
-            {% endif %}
-            {% if lunch_item["directions"] is not none %}
-            {% set directions_lst = lunch_item["directions"].split(';;;') %}
-            <ol>
-              {% for j in range(directions_lst|length) %}
-              <li>{{directions_lst[j]}}</li>
+              {% for i in range(5 - lunch_item["rating"] | int) %}
+              &#9734
               {% endfor %}
-            </ol>
+            </p>
             {% endif %}
+            <br>
+            {% endif %}
+            {% if lunch_item["calories"] is not none
+            or lunch_item["fat"] is not none or lunch_item["protein"] 
+            is not none or lunch_item["sodium"] is not none %}
+            <h3 class="modal-body-header">Nutritional Information</h3>
+            <p class="underline">____________________________________</p>
             {% if lunch_item["calories"] is not none %}
             <p><strong>Calories:</strong> {{lunch_item["calories"] | int}}</p>
             {% endif %}
@@ -454,15 +486,30 @@
             {% if lunch_item["sodium"] is not none %}
             <p><strong>Sodium:</strong> {{lunch_item["sodium"] | int}}mg</p>
             {% endif %}
-            {% if lunch_item["rating"] is not none %}
-            <p>
-              {% for i in range(lunch_item["rating"] | int) %}
-              &#9733
+            <br>
+            {% endif %}
+            {% if lunch_item["ingredients"] is not none 
+            or lunch_item["directions"] is not none %}
+            <h3 class="modal-body-header">Preparation</h3>
+            <p class="underline">_____________________</p>
+            {% if lunch_item["ingredients"] is not none %}
+            <p><strong>Ingredients:</strong></p>
+            {% set ingredients_lst = lunch_item["ingredients"].split(';;;') %}
+            <ul>
+              {% for j in range(ingredients_lst|length) %}
+              <li>{{ingredients_lst[j]}}</li>
               {% endfor %}
-              {% for i in range(5 - lunch_item["rating"] | int) %}
-              &#9734
+            </ul>
+            {% endif %}
+            {% if lunch_item["directions"] is not none %}
+            <p><strong>Directions:</strong></p>
+            {% set directions_lst = lunch_item["directions"].split(';;;') %}
+            <ol>
+              {% for j in range(directions_lst|length) %}
+              <li>{{directions_lst[j]}}</li>
               {% endfor %}
-            </p>
+            </ol>
+            {% endif %}
             {% endif %}
           </div>
           <div class="modal-footer">
@@ -486,23 +533,23 @@
           <div class="modal-body">
             {% if dinner_item["description"] is not none %}
             <p>{{dinner_item["description"]}}</p>
-            {% endif %}
-            {% if dinner_item["ingredients"] is not none %}
-            {% set ingredients_lst = dinner_item["ingredients"].split(';;;') %}
-            <ul>
-              {% for j in range(ingredients_lst|length) %}
-              <li>{{ingredients_lst[j]}}</li>
+            {% if dinner_item["rating"] is not none %}
+            <p>
+              {% for i in range(dinner_item["rating"] | int) %}
+              &#9733
               {% endfor %}
-            </ul>
-            {% endif %}
-            {% if dinner_item["directions"] is not none %}
-            {% set directions_lst = dinner_item["directions"].split(';;;') %}
-            <ol>
-              {% for j in range(directions_lst|length) %}
-              <li>{{directions_lst[j]}}</li>
+              {% for i in range(5 - dinner_item["rating"] | int) %}
+              &#9734
               {% endfor %}
-            </ol>
+            </p>
             {% endif %}
+            <br>
+            {% endif %}
+            {% if dinner_item["calories"] is not none
+            or dinner_item["fat"] is not none or dinner_item["protein"] 
+            is not none or dinner_item["sodium"] is not none %}
+            <h3 class="modal-body-header">Nutritional Information</h3>
+            <p class="underline">____________________________________</p>
             {% if dinner_item["calories"] is not none %}
             <p><strong>Calories:</strong> {{dinner_item["calories"] | int}}</p>
             {% endif %}
@@ -515,15 +562,30 @@
             {% if dinner_item["sodium"] is not none %}
             <p><strong>Sodium:</strong> {{dinner_item["sodium"] | int}}mg</p>
             {% endif %}
-            {% if dinner_item["rating"] is not none %}
-            <p>
-              {% for i in range(dinner_item["rating"] | int) %}
-              &#9733
+            <br>
+            {% endif %}
+            {% if dinner_item["ingredients"] is not none 
+            or dinner_item["directions"] is not none %}
+            <h3 class="modal-body-header">Preparation</h3>
+            <p class="underline">_____________________</p>
+            {% if dinner_item["ingredients"] is not none %}
+            <p><strong>Ingredients:</strong></p>
+            {% set ingredients_lst = dinner_item["ingredients"].split(';;;') %}
+            <ul>
+              {% for j in range(ingredients_lst|length) %}
+              <li>{{ingredients_lst[j]}}</li>
               {% endfor %}
-              {% for i in range(5 - dinner_item["rating"] | int) %}
-              &#9734
+            </ul>
+            {% endif %}
+            {% if dinner_item["directions"] is not none %}
+            <p><strong>Directions:</strong></p>
+            {% set directions_lst = dinner_item["directions"].split(';;;') %}
+            <ol>
+              {% for j in range(directions_lst|length) %}
+              <li>{{directions_lst[j]}}</li>
               {% endfor %}
-            </p>
+            </ol>
+            {% endif %}
             {% endif %}
           </div>
           <div class="modal-footer">
