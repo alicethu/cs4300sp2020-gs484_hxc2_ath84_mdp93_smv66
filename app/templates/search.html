@@ -4,6 +4,7 @@
   <link rel="stylesheet" href="/static/bootstrap.min.css">
   <link rel="stylesheet" href="/static/main.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <style>
     body {
       padding-top: 0px;
@@ -41,7 +42,7 @@
       display: flex;
       flex-direction: row;
       justify-content: space-evenly;
-      margin: 10px;
+      margin: 20px;
     }
 
     .category {
@@ -50,6 +51,10 @@
       margin: 0px 15px;
       background-color: rgba(199, 181, 163, 0.8);
       width: 100%;
+    }
+
+    .recipe-div {
+      cursor: pointer;
     }
 
     .form-group {
@@ -86,6 +91,19 @@
 
     h5 {
       line-height: 0px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: -1 !important;
+    }
+
+    .modal-lg {
+      width: 88%;
     }
   </style>
 </head>
@@ -163,22 +181,6 @@
       </div>
 
     </form>
-    <script>
-      function displayData() {
-        var resultDiv = $("#results");
-        var breakfast_data = JSON.parse($("#breakfast_data").text());
-        var lunch_data = JSON.parse($("#lunch_data").text());
-        var dinner_data = JSON.parse($("#dinner_data").text());
-
-        var resultHTML = "";
-
-        if (breakfast_data != null && breakfast_data.length > 0) resultHTML += $('#breakfastHtml').html();
-        if (lunch_data != null && lunch_data.length > 0) resultHTML += $('#lunchHtml').html();
-        if (dinner_data != null && dinner_data.length > 0) resultHTML += $('#dinnerHtml').html();
-
-        resultDiv.html(resultHTML);
-      }
-    </script>
     <h1>{{output_message}}</h1>
     <br><br>
     <div id="results" class="results-div">
@@ -190,31 +192,33 @@
           <h5>___________________________</h5>
           <br>
           {% for i in range(breakfast_data|length) %}
-          <p class="normal-title">{{i + 1}}. {{breakfast_data[i]["title"]}}</p>
-          {% if breakfast_data[i]["description"] is not none %}
-          <p><i>{{breakfast_data[i]["description"]}}</i></p>
-          {% endif %}
-          {% if breakfast_data[i]["calories"] is not none %}
-          <p><strong>Calories:</strong> {{breakfast_data[i]["calories"] | int}}</p>
-          {% endif %}
-          {% if breakfast_data[i]["fat"] is not none %}
-          <p><strong>Fat:</strong> {{breakfast_data[i]["fat"] | int}}g</p>
-          {% endif %}
-          {% if breakfast_data[i]["protein"] is not none %}
-          <p><strong>Protein:</strong> {{breakfast_data[i]["protein"] | int}}g</p>
-          {% endif %}
-          {% if breakfast_data[i]["sodium"] is not none %}
-          <p><strong>Sodium:</strong> {{breakfast_data[i]["sodium"] | int}}mg</p>
-          {% endif %}
-          {% if breakfast_data[i]["rating"] is not none %}
-          <p>
-            {% for i in range(breakfast_data[i]["rating"] | int) %}
-            &#9733
-            {% endfor %}
-            {% for i in range(5 - breakfast_data[i]["rating"] | int) %}
-            &#9734
-            {% endfor %}
-          </p>
+          <div id="div-{{breakfast_data[i]['id']}}" class="recipe-div" onclick="displayModal(this.id)">
+            <p class="normal-title">{{i + 1}}. {{breakfast_data[i]["title"]}}</p>
+            {% if breakfast_data[i]["description"] is not none %}
+            <p><i>{{breakfast_data[i]["description"]}}</i></p>
+            {% endif %}
+            {% if breakfast_data[i]["calories"] is not none %}
+            <p><strong>Calories:</strong> {{breakfast_data[i]["calories"] | int}}</p>
+            {% endif %}
+            {% if breakfast_data[i]["fat"] is not none %}
+            <p><strong>Fat:</strong> {{breakfast_data[i]["fat"] | int}}g</p>
+            {% endif %}
+            {% if breakfast_data[i]["protein"] is not none %}
+            <p><strong>Protein:</strong> {{breakfast_data[i]["protein"] | int}}g</p>
+            {% endif %}
+            {% if breakfast_data[i]["sodium"] is not none %}
+            <p><strong>Sodium:</strong> {{breakfast_data[i]["sodium"] | int}}mg</p>
+            {% endif %}
+            {% if breakfast_data[i]["rating"] is not none %}
+            <p>
+              {% for i in range(breakfast_data[i]["rating"] | int) %}
+              &#9733
+              {% endfor %}
+              {% for i in range(5 - breakfast_data[i]["rating"] | int) %}
+              &#9734
+              {% endfor %}
+            </p>
+          </div>
           <br>
           {% endif %}
           {% endfor %}
@@ -228,31 +232,33 @@
           <h5>______________________</h5>
           <br>
           {% for i in range(lunch_data|length) %}
-          <p class="normal-title">{{i + 1}}. {{lunch_data[i]["title"]}}</p>
-          {% if lunch_data[i]["description"] is not none %}
-          <p><i>{{lunch_data[i]["description"]}}</i></p>
-          {% endif %}
-          {% if lunch_data[i]["calories"] is not none %}
-          <p><strong>Calories:</strong> {{lunch_data[i]["calories"] | int}}</p>
-          {% endif %}
-          {% if lunch_data[i]["fat"] is not none %}
-          <p><strong>Fat:</strong> {{lunch_data[i]["fat"] | int}}g</p>
-          {% endif %}
-          {% if lunch_data[i]["protein"] is not none %}
-          <p><strong>Protein:</strong> {{lunch_data[i]["protein"] | int}}g</p>
-          {% endif %}
-          {% if lunch_data[i]["sodium"] is not none %}
-          <p><strong>Sodium:</strong> {{lunch_data[i]["sodium"] | int}}mg</p>
-          {% endif %}
-          {% if lunch_data[i]["rating"] is not none %}
-          <p>
-            {% for i in range(lunch_data[i]["rating"] | int) %}
-            &#9733
-            {% endfor %}
-            {% for i in range(5 - lunch_data[i]["rating"] | int) %}
-            &#9734
-            {% endfor %}
-          </p>
+          <div id="div-{{lunch_data[i]['id']}}" class="recipe-div" onclick="displayModal(this.id)">
+            <p class="normal-title">{{i + 1}}. {{lunch_data[i]["title"]}}</p>
+            {% if lunch_data[i]["description"] is not none %}
+            <p><i>{{lunch_data[i]["description"]}}</i></p>
+            {% endif %}
+            {% if lunch_data[i]["calories"] is not none %}
+            <p><strong>Calories:</strong> {{lunch_data[i]["calories"] | int}}</p>
+            {% endif %}
+            {% if lunch_data[i]["fat"] is not none %}
+            <p><strong>Fat:</strong> {{lunch_data[i]["fat"] | int}}g</p>
+            {% endif %}
+            {% if lunch_data[i]["protein"] is not none %}
+            <p><strong>Protein:</strong> {{lunch_data[i]["protein"] | int}}g</p>
+            {% endif %}
+            {% if lunch_data[i]["sodium"] is not none %}
+            <p><strong>Sodium:</strong> {{lunch_data[i]["sodium"] | int}}mg</p>
+            {% endif %}
+            {% if lunch_data[i]["rating"] is not none %}
+            <p>
+              {% for i in range(lunch_data[i]["rating"] | int) %}
+              &#9733
+              {% endfor %}
+              {% for i in range(5 - lunch_data[i]["rating"] | int) %}
+              &#9734
+              {% endfor %}
+            </p>
+          </div>
           <br>
           {% endif %}
           {% endfor %}
@@ -266,31 +272,33 @@
           <h5>________________________</h5>
           <br>
           {% for i in range(dinner_data|length) %}
-          <p class="normal-title">{{i + 1}}. {{dinner_data[i]["title"]}}</p>
-          {% if dinner_data[i]["description"] is not none %}
-          <p><i>{{dinner_data[i]["description"]}}</i></p>
-          {% endif %}
-          {% if dinner_data[i]["calories"] is not none %}
-          <p><strong>Calories:</strong> {{dinner_data[i]["calories"] | int}}</p>
-          {% endif %}
-          {% if dinner_data[i]["fat"] is not none %}
-          <p><strong>Fat:</strong> {{dinner_data[i]["fat"] | int}}g</p>
-          {% endif %}
-          {% if dinner_data[i]["protein"] is not none %}
-          <p><strong>Protein:</strong> {{dinner_data[i]["protein"] | int}}g</p>
-          {% endif %}
-          {% if dinner_data[i]["sodium"] is not none %}
-          <p><strong>Sodium:</strong> {{dinner_data[i]["sodium"] | int}}mg</p>
-          {% endif %}
-          {% if dinner_data[i]["rating"] is not none %}
-          <p>
-            {% for i in range(dinner_data[i]["rating"] | int) %}
-            &#9733
-            {% endfor %}
-            {% for i in range(5 - dinner_data[i]["rating"] | int) %}
-            &#9734
-            {% endfor %}
-          </p>
+          <div id="div-{{dinner_data[i]['id']}}" class="recipe-div" onclick="displayModal(this.id)">
+            <p class="normal-title">{{i + 1}}. {{dinner_data[i]["title"]}}</p>
+            {% if dinner_data[i]["description"] is not none %}
+            <p><i>{{dinner_data[i]["description"]}}</i></p>
+            {% endif %}
+            {% if dinner_data[i]["calories"] is not none %}
+            <p><strong>Calories:</strong> {{dinner_data[i]["calories"] | int}}</p>
+            {% endif %}
+            {% if dinner_data[i]["fat"] is not none %}
+            <p><strong>Fat:</strong> {{dinner_data[i]["fat"] | int}}g</p>
+            {% endif %}
+            {% if dinner_data[i]["protein"] is not none %}
+            <p><strong>Protein:</strong> {{dinner_data[i]["protein"] | int}}g</p>
+            {% endif %}
+            {% if dinner_data[i]["sodium"] is not none %}
+            <p><strong>Sodium:</strong> {{dinner_data[i]["sodium"] | int}}mg</p>
+            {% endif %}
+            {% if dinner_data[i]["rating"] is not none %}
+            <p>
+              {% for i in range(dinner_data[i]["rating"] | int) %}
+              &#9733
+              {% endfor %}
+              {% for i in range(5 - dinner_data[i]["rating"] | int) %}
+              &#9734
+              {% endfor %}
+            </p>
+          </div>
           <br>
           {% endif %}
           {% endfor %}
@@ -302,11 +310,201 @@
       <p id="lunch_data" class="hidden">{{ lunch_data | tojson }}</p>
       <p id="dinner_data" class="hidden">{{ dinner_data | tojson }}</p>
       <script>
+        function displayData() {
+          var resultDiv = $("#results");
+          let breakfast_data = JSON.parse($("#breakfast_data").text());
+          let lunch_data = JSON.parse($("#lunch_data").text());
+          let dinner_data = JSON.parse($("#dinner_data").text());
+
+          var resultHTML = "";
+
+          if (breakfast_data != null && breakfast_data.length > 0) resultHTML += $('#breakfastHtml').html();
+          if (lunch_data != null && lunch_data.length > 0) resultHTML += $('#lunchHtml').html();
+          if (dinner_data != null && dinner_data.length > 0) resultHTML += $('#dinnerHtml').html();
+
+          resultDiv.html(resultHTML);
+        }
+
+        function displayModal(clickedID) {
+          let id_num = clickedID.split("-")[1];
+          $("#modal-" + id_num).modal('show');
+        }
+
         displayData();
       </script>
       {% endif %}
     </div>
   </main>
+  <div id="modalContainer">
+    {% if breakfast_data %}
+    {% for i in range(breakfast_data|length) %}
+    {% set breakfast_item = breakfast_data[i] %}
+    <div id="modal-{{breakfast_item['id']}}" class="modal fade" role="dialog" tabindex="-1" data-backdrop="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h2 class="modal-title">{{breakfast_item["title"]}}</h2>
+          </div>
+          <div class="modal-body">
+            {% if breakfast_item["description"] is not none %}
+            <p>{{breakfast_item["description"]}}</p>
+            {% endif %}
+            {% if breakfast_item["ingredients"] is not none %}
+            <p>{{breakfast_item["ingredients"]}}</p>
+            {% endif %}
+            {% if breakfast_item["directions"] is not none %}
+            {% set directions_lst = breakfast_item["directions"].split('. ') %}
+            <ol>
+              {% for j in range(directions_lst|length) %}
+              <li>{{directions_lst[j]}}</li>
+              {% endfor %}
+            </ol>
+            {% endif %}
+            {% if breakfast_item["calories"] is not none %}
+            <p><strong>Calories:</strong> {{breakfast_item["calories"] | int}}</p>
+            {% endif %}
+            {% if breakfast_item["fat"] is not none %}
+            <p><strong>Fat:</strong> {{breakfast_item["fat"] | int}}g</p>
+            {% endif %}
+            {% if breakfast_item["protein"] is not none %}
+            <p><strong>Protein:</strong> {{breakfast_item["protein"] | int}}g</p>
+            {% endif %}
+            {% if breakfast_item["sodium"] is not none %}
+            <p><strong>Sodium:</strong> {{breakfast_item["sodium"] | int}}mg</p>
+            {% endif %}
+            {% if breakfast_item["rating"] is not none %}
+            <p>
+              {% for i in range(breakfast_item["rating"] | int) %}
+              &#9733
+              {% endfor %}
+              {% for i in range(5 - breakfast_item["rating"] | int) %}
+              &#9734
+              {% endfor %}
+            </p>
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if lunch_data %}
+    {% for i in range(lunch_data|length) %}
+    {% set lunch_item = lunch_data[i] %}
+    <div id="modal-{{lunch_item['id']}}" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h2 class="modal-title">{{lunch_item["title"]}}</h2>
+          </div>
+          <div class="modal-body">
+            {% if lunch_item["description"] is not none %}
+            <p>{{lunch_item["description"]}}</p>
+            {% endif %}
+            {% if lunch_item["ingredients"] is not none %}
+            <p>{{lunch_item["ingredients"]}}</p>
+            {% endif %}
+            {% if lunch_item["directions"] is not none %}
+            {% set directions_lst = lunch_item["directions"].split('. ') %}
+            <ol>
+              {% for j in range(directions_lst|length) %}
+              <li>{{directions_lst[j]}}</li>
+              {% endfor %}
+            </ol>
+            {% endif %}
+            {% if lunch_item["calories"] is not none %}
+            <p><strong>Calories:</strong> {{lunch_item["calories"] | int}}</p>
+            {% endif %}
+            {% if lunch_item["fat"] is not none %}
+            <p><strong>Fat:</strong> {{lunch_item["fat"] | int}}g</p>
+            {% endif %}
+            {% if lunch_item["protein"] is not none %}
+            <p><strong>Protein:</strong> {{lunch_item["protein"] | int}}g</p>
+            {% endif %}
+            {% if lunch_item["sodium"] is not none %}
+            <p><strong>Sodium:</strong> {{lunch_item["sodium"] | int}}mg</p>
+            {% endif %}
+            {% if lunch_item["rating"] is not none %}
+            <p>
+              {% for i in range(lunch_item["rating"] | int) %}
+              &#9733
+              {% endfor %}
+              {% for i in range(5 - lunch_item["rating"] | int) %}
+              &#9734
+              {% endfor %}
+            </p>
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if dinner_data %}
+    {% for i in range(dinner_data|length) %}
+    {% set dinner_item = dinner_data[i] %}
+    <div id="modal-{{dinner_item['id']}}" class="modal fade" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h2 class="modal-title">{{dinner_item["title"]}}</h2>
+          </div>
+          <div class="modal-body">
+            {% if dinner_item["description"] is not none %}
+            <p>{{dinner_item["description"]}}</p>
+            {% endif %}
+            {% if dinner_item["ingredients"] is not none %}
+            <p>{{dinner_item["ingredients"]}}</p>
+            {% endif %}
+            {% if dinner_item["directions"] is not none %}
+            {% set directions_lst = dinner_item["directions"].split('. ') %}
+            <ol>
+              {% for j in range(directions_lst|length) %}
+              <li>{{directions_lst[j]}}</li>
+              {% endfor %}
+            </ol>
+            {% endif %}
+            {% if dinner_item["calories"] is not none %}
+            <p><strong>Calories:</strong> {{dinner_item["calories"] | int}}</p>
+            {% endif %}
+            {% if dinner_item["fat"] is not none %}
+            <p><strong>Fat:</strong> {{dinner_item["fat"] | int}}g</p>
+            {% endif %}
+            {% if dinner_item["protein"] is not none %}
+            <p><strong>Protein:</strong> {{dinner_item["protein"] | int}}g</p>
+            {% endif %}
+            {% if dinner_item["sodium"] is not none %}
+            <p><strong>Sodium:</strong> {{dinner_item["sodium"] | int}}mg</p>
+            {% endif %}
+            {% if dinner_item["rating"] is not none %}
+            <p>
+              {% for i in range(dinner_item["rating"] | int) %}
+              &#9733
+              {% endfor %}
+              {% for i in range(5 - dinner_item["rating"] | int) %}
+              &#9734
+              {% endfor %}
+            </p>
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
 </body>
 
 </html>
