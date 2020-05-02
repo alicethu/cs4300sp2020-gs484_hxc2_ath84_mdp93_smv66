@@ -100,6 +100,7 @@
       bottom: 0;
       left: 0;
       z-index: -1 !important;
+      opacity: 0.5;
     }
 
     .modal-lg {
@@ -362,6 +363,13 @@
           $("#modal-" + id_num).modal('show');
         }
 
+        function fixNumbering(directions, id) {
+          let regex = /[0-9]+\./g;
+          let isNumbering = directions.match(regex) != null;
+          if (isNumbering) directions = directions.substring(3).trim();
+          $(id).text(directions);
+        }
+
         displayData();
       </script>
       {% endif %}
@@ -430,7 +438,11 @@
             {% set directions_lst = breakfast_item["directions"].split(';;;') %}
             <ol>
               {% for j in range(directions_lst|length) %}
+              {% if ((j + 1) ~ ".") in directions_lst[j][:4] %}
+              <li>{{directions_lst[j][3:]}}</li>
+              {% else %}
               <li>{{directions_lst[j]}}</li>
+              {% endif %}
               {% endfor %}
             </ol>
             {% endif %}
