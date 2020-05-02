@@ -225,3 +225,34 @@ def populate_matrices(data, data_df1, data_df2):
   data_df1 = data_df1 * np.log(N / np.count_nonzero(data_df1, axis = 0) )
   data_df2 = data_df2 * np.log(N / np.count_nonzero(data_df2, axis = 0) )
 
+"""
+Updates recipe table in database, such that for each recipe, the list of 
+ingredients, the list of directions, and the list of categories are each stored
+as a string, with ";;;" separating each item of the list.
+"""
+def delimitDatabaseLists():
+  placeholder = db.session.query(Recipe).filter_by(title="PLACEHOLDER XY").first()
+  if placeholder is not None:
+    return
+  r = Recipe(title="PLACEHOLDER XY")
+  db.session.add(r)
+  db.session.flush()
+  db.session.commit()
+  with open("app/full_format_recipes.json") as f:
+    data = json.loads(f.readlines()[0])
+    for i in range(len(data)):
+      d = data[i]
+      if len(d) == 11:
+        ingredients = " ".join(d["ingredients"])
+        recipe = db.session.query(Recipe).filter_by(ingredients=ingredients).first()
+        if recipe:
+          updated_ingredients = ";;;".join(d["ingredients"])
+          updated_directions = ";;;".join(d["directions"])
+          updated_categories = ";;;".join(d["categories"])
+
+          # updating recipe fields
+          recipe.ingredients = updated_ingredients
+          recipe.directions = updated_directions
+          recipe.categories = updated_categories
+          db.session.flush()
+          db.session.commit()
