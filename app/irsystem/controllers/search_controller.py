@@ -2,7 +2,7 @@ from . import *
 from app.irsystem.models.helpers import *
 from app.irsystem.models.helpers import NumpyEncoder as NumpyEncoder
 from flask import request, jsonify
-from sqlalchemy import or_, func
+from sqlalchemy import and_, or_, func
 from itertools import combinations
 import re
 import math
@@ -155,6 +155,48 @@ def rank_recipes_boolean(fav_foods,omit_foods,inv_idx,rcps):
             r['rating'] = 0
     recipes = sorted(recipes, key=lambda k: k['rating'], reverse=True)
     return recipes
+
+
+def rank_recipes_boolean_ORNOT(fav_foods,omit_foods,inv_idx,rcps):
+    """ Returns the matching recipes in order of best rating
+        Params: {fav_foods: List of str
+                omit_foods: List of str
+                inv_idx: List of tuples
+                rcps: List of Dicts
+                }
+        Returns: recipes: List of Dicts (any term in favorite foods, no terms in omit_foods)
+    """
+    rec_ids = merge_postings_ANDNOT(combine_AND_boolean_terms(fav_foods,inv_idx), combine_NOT_boolean_terms(omit_foods,inv_idx))
+    if len(rec_ids) == 0:
+        return []
+    recipes = [rcps[i] for i in rec_ids]
+    for r in recipes:
+        if r['rating'] is None or r['rating'] > 5:
+            r['rating'] = 0
+    recipes = sorted(recipes, key=lambda k: k['rating'], reverse=True)
+    return recipes
+
+
+def combine_rank_recipes_ORAND(or_results,fav_foods):
+    """ Returns the matching recipes in order of best match
+        Params: {fav_foods: List of str
+                 or_results: List of Dicts
+                }
+        Returns: recipes: List of Dicts
+    """
+    ranked_rcps = []
+    
+    for r in or_results:
+        if r['rating'] is None or r['rating'] > 5:
+            r['rating'] = 0
+        r['count_matches_title'] = len([food for food in fav_foods if food in tokenize(r['title']) ] )
+        r['count_matches_ingr'] = len([food for food in fav_foods if food in tokenize(r['ingredients']) ] )
+        r['count_matches_both'] = len([food for food in fav_foods if food in tokenize(r['title']) and food in tokenize(r['ingredients']) ] )
+    
+    ranked_rcps = sorted(or_results, key=lambda k: (k['rating']/10 + 
+        k['count_matches_title']/2 + k['count_matches_ingr']/4 + 
+        k['count_matches_both']), reverse=True)
+    return ranked_rcps
 
 
 project_name = "Fitness Dream Team"
@@ -337,18 +379,20 @@ def version_2_search(fav_foods, omit_foods, breakfast_selected, lunch_selected,
     return output_message, breakfast_data, lunch_data, dinner_data
 
 
-def final_search(query_words, omit_words, recipes):
+def final_search(query_words, omit_words, recipes_by_title, recipes_by_ingredients):
     all_data = []
-    if not recipes:
+    if not recipes_by_title and not recipes_by_ingredients:
         all_data = []
     else:
         # boolean search
-        recipes_out = recipe_schema.dump(recipes)
-        inv_idx_ingredients = build_inverted_index(recipes_out, "ingredients")
-        inv_idx_title = build_inverted_index(recipes_out, "title")
-        ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_title, recipes_out)
+        recipes_title_out = recipe_schema.dump(recipes_by_title)
+        # inv_idx_ingredients = build_inverted_index(recipes_out, "ingredients")
+        # inv_idx_title = build_inverted_index(recipes_out, "title")
+        # ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_title, recipes_out)
+        ranked_results = combine_rank_recipes_ORAND(recipes_title_out, query_words)
         if len(ranked_results) < 10:
-            ranked_ingredient_results = rank_recipes_boolean(query_words, omit_words, inv_idx_ingredients, recipes_out)
+            recipes_ingredients_out = recipe_schema.dump(recipes_by_ingredients)
+            ranked_ingredient_results = combine_rank_recipes_ORAND(recipes_ingredients_out, query_words)
             if len(ranked_ingredient_results) == 0:
                 all_data = []
             else:
@@ -364,32 +408,49 @@ def final_search(query_words, omit_words, recipes):
 
 """
 Returns a list of recipes such that each recipe...
-1) matches the specified meal type, m_type
-2) contains at least one of the words in query_words_with_caps, either in its
-    title, description, ingredients, directions, or categories
-3) has a number of calories less than or equal to cal_limit
-4) is not categorized as "Drink" if drink_included is None
+1) is categorized as the specified meal type, m_type;
+2) contains (in the field specified by field_name) at least one of the words in 
+    query_words_with_caps;
+3) contains (in the field specified by field_name) none of the words in
+    omit_words_with_caps;
+4) has a number of calories less than or equal to cal_limit;
+and 5) is not categorized as "Drink" if drink_included is None
 """
-def get_initial_recipes_list(m_type, query_words_with_caps, cal_limit, drink_included):
+def get_recipes_by_OR(m_type, query_words_with_caps, omit_words_with_caps, 
+    cal_limit, drink_included, field_name):
     recipes = None # temporary initialization
-    if drink_included:
-        recipes = Recipe.query.filter(
-                    or_(
-                        or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
-                    )).filter(Recipe.calories <= cal_limit).filter_by(meal_type=m_type).all()
-    else:
-        recipes = Recipe.query.filter(
-                    or_(
-                        or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.description.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.directions.like("%{}%".format(word)) for word in query_words_with_caps),
-                        or_(Recipe.categories.like("%{}%".format(word)) for word in query_words_with_caps),
-                    )).filter(Recipe.calories <= cal_limit).filter(~Recipe.categories.like("%Drink%")).filter_by(meal_type=m_type).all()
+    if field_name == "title":
+        if drink_included:
+            recipes = Recipe.query.filter(
+                        and_(
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            and_(~Recipe.title.like("%{}%".format(word)) for word in omit_words_with_caps)
+                        )).filter(Recipe.calories <= cal_limit)\
+                            .filter_by(meal_type=m_type).all()
+        else:
+            recipes = Recipe.query.filter(
+                        and_(
+                            or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
+                            and_(~Recipe.title.like("%{}%".format(word)) for word in omit_words_with_caps)
+                        )).filter(Recipe.calories <= cal_limit)\
+                            .filter(~Recipe.categories.like("%Drink%"))\
+                                .filter_by(meal_type=m_type).all()
+    if field_name == "ingredients":
+        if drink_included:
+            recipes = Recipe.query.filter(
+                        and_(
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in omit_words_with_caps)
+                        )).filter(Recipe.calories <= cal_limit)\
+                            .filter_by(meal_type=m_type).all()
+        else:
+            recipes = Recipe.query.filter(
+                        and_(
+                            or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in omit_words_with_caps)
+                        )).filter(Recipe.calories <= cal_limit)\
+                            .filter(~Recipe.categories.like("%Drink%"))\
+                                .filter_by(meal_type=m_type).all()
     return recipes
 
 
@@ -446,10 +507,17 @@ def search():
                 query_words_with_caps.append(word)
                 query_words_with_caps.append(word.capitalize())
             
-            omit_words = omit_foods.split(",") # accounting for comma-separated queries
-            omit_words = [word.strip() for word in omit_words]
-            if len(omit_words) == 1:
-                omit_words = omit_words[0].split(";") # accounting for semicolon-separated queries
+            omit_words_with_caps = []
+            omit_words = []
+            if omit_foods:
+                omit_words = omit_foods.split(",") # accounting for comma-separated queries
+                omit_words = [word.strip() for word in omit_words]
+                if len(omit_words) == 1:
+                    omit_words = omit_words[0].split(";") # accounting for semicolon-separated queries
+
+                for word in omit_words:
+                    omit_words_with_caps.append(word)
+                    omit_words_with_caps.append(word.capitalize())
 
             if breakfast_selected is None and lunch_selected is None and dinner_selected is None:
                 breakfast_selected = "on"
@@ -457,17 +525,32 @@ def search():
                 dinner_selected = "on"
 
             if breakfast_selected:
-                breakfast_recipes = get_initial_recipes_list("breakfast", 
-                    query_words_with_caps, cal_limit, drink_included)
-                breakfast_data = final_search(query_words, omit_words, breakfast_recipes)
+                breakfast_recipes_by_title = get_recipes_by_OR("breakfast",
+                    query_words_with_caps, omit_words_with_caps, cal_limit, 
+                    drink_included, "title")
+                breakfast_recipes_by_ingredients = get_recipes_by_OR("breakfast",
+                    query_words_with_caps, omit_words_with_caps, cal_limit, 
+                    drink_included, "ingredients")
+                breakfast_data = final_search(query_words, omit_words, 
+                    breakfast_recipes_by_title, breakfast_recipes_by_ingredients)
             if lunch_selected:
-                lunch_recipes = get_initial_recipes_list("lunch", 
-                    query_words_with_caps, cal_limit, drink_included)
-                lunch_data = final_search(query_words, omit_words, lunch_recipes)
+                lunch_recipes_by_title = get_recipes_by_OR("lunch",
+                    query_words_with_caps, omit_words_with_caps, cal_limit, 
+                    drink_included, "title")
+                lunch_recipes_by_ingredients = get_recipes_by_OR("lunch",
+                    query_words_with_caps, omit_words_with_caps, cal_limit, 
+                    drink_included, "ingredients")
+                lunch_data = final_search(query_words, omit_words, 
+                    lunch_recipes_by_title, lunch_recipes_by_ingredients)
             if dinner_selected:
-                dinner_recipes = get_initial_recipes_list("dinner",
-                    query_words_with_caps, cal_limit, drink_included)
-                dinner_data = final_search(query_words, omit_words, dinner_recipes)
+                dinner_recipes_by_title = get_recipes_by_OR("dinner",
+                    query_words_with_caps, omit_words_with_caps, cal_limit, 
+                    drink_included, "title")
+                dinner_recipes_by_ingredients = get_recipes_by_OR("dinner",
+                    query_words_with_caps, omit_words_with_caps, cal_limit, 
+                    drink_included, "ingredients")
+                dinner_data = final_search(query_words, omit_words, 
+                    dinner_recipes_by_title, dinner_recipes_by_ingredients)
             
             result_success = False
             for data in [breakfast_data, lunch_data, dinner_data]:
