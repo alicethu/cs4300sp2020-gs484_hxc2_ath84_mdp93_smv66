@@ -6,6 +6,7 @@ from sqlalchemy import and_, or_, func
 from itertools import combinations
 import re
 import math
+import html
 from collections import Counter
 from app import db
 from app.irsystem.models import Recipe, RecipeSchema
@@ -467,10 +468,30 @@ def search():
     dinner_selected = request.args.get('dinner')
     drink_included = request.args.get('include-drink')
 
+    # user input sanitization
+    if version is not None and not version.isnumeric():
+        version = None
+    # user input sanitization
+    if omit_foods:
+        omit_foods = html.escape(omit_foods)
+    if breakfast_selected:
+        breakfast_selected = html.escape(breakfast_selected)
+    if lunch_selected:
+        lunch_selected = html.escape(lunch_selected)
+    if dinner_selected:
+        dinner_selected = html.escape(dinner_selected)
+    if drink_included:
+        drink_included = html.escape(drink_included)
+    
+    # check if user specifies any meal types or not
+    no_meal_type_specified = (breakfast_selected is None 
+        and lunch_selected is None and dinner_selected is None)
+
     # if calorie limit is not provided, the limit is set to maximum number of
     # calories for any recipe in the database, so that all recipes are allowed
+    max_calories = int(db.session.query(func.max(Recipe.calories)).one()[0])
     if not cal_limit:
-        cal_limit = int(db.session.query(func.max(Recipe.calories)).one()[0])
+        cal_limit = max_calories
 
     # default initialization of output
     output_message = ''
@@ -491,6 +512,7 @@ def search():
             lunch_data=lunch_data, dinner_data=dinner_data)
     else:
         if fav_foods:
+            fav_foods = html.escape(fav_foods)
             output_message = "Your search: " + fav_foods
 
             # basic query cleaning/splitting 
@@ -526,7 +548,7 @@ def search():
                     omit_words_with_caps.append(word)
                     omit_words_with_caps.append(word.capitalize())
 
-            if breakfast_selected is None and lunch_selected is None and dinner_selected is None:
+            if no_meal_type_specified:
                 breakfast_selected = "on"
                 lunch_selected = "on"
                 dinner_selected = "on"
@@ -566,7 +588,15 @@ def search():
                     break
             if not result_success:
                 output_message = "No Results Found:("
-
+        inputs = {"fav_foods": fav_foods, "omit_foods": omit_foods, 
+            "breakfast_selected": breakfast_selected, "lunch_selected": lunch_selected, "dinner_selected": dinner_selected, 
+            "drink_included": drink_included, "cal_limit": cal_limit}
+        if cal_limit == max_calories:
+            inputs["cal_limit"] = ""
+        if no_meal_type_specified:
+            inputs["breakfast_selected"] = ""
+            inputs["lunch_selected"] = ""
+            inputs["dinner_selected"] = ""
         return render_template('search.html', name=project_name, 
             netid=net_ids, output_message=output_message, breakfast_data=breakfast_data, 
-            lunch_data=lunch_data, dinner_data=dinner_data)
+            lunch_data=lunch_data, dinner_data=dinner_data, inputs=inputs)

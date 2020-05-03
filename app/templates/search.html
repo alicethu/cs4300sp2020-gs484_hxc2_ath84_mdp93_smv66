@@ -130,7 +130,7 @@
     }
 
     .modal-title {
-      padding: 20px 100px;
+      padding: 20px 85px;
     }
 
     .modal-body {
@@ -167,7 +167,28 @@
     .close {
       font-size: 220%;
     }
+
+    #submit {
+      margin-left: 50px;
+    }
+
+    #clear-input {
+      margin-right: 30px;
+      width: 110px;
+      color: white;
+    }
   </style>
+  <script>
+    function clearInputs() {
+      $("#fav-input").val("");
+      $("#res-input").val("");
+      $("#cal-input").val("");
+      $("#b-toggle").prop("checked", false);
+      $("#l-toggle").prop("checked", false);
+      $("#d-toggle").prop("checked", false);
+      $("#drink-toggle").prop("checked", false);
+    }
+  </script>
 </head>
 
 <body>
@@ -182,7 +203,7 @@
     -->
   <main>
     <form class="form-inline global-search">
-      <a href=search.html>
+      <a href="/">
         <h1 style="font-size: 55px; font-family:Futura">
           <span style="color: rgb(4, 70, 19);">S</span>
           <span style="color: rgb(17, 80, 29);">M</span>
@@ -206,47 +227,73 @@
 
       <br><br>
 
+      <!-- setting form values -->
+      {% if output_message %}
+      {% set fav_foods = inputs.fav_foods %}
+      {% set omit_foods = inputs.omit_foods %}
+      {% set cal_limit = inputs.cal_limit %}
+      {% endif %}
+
       <div class="form-group">
-        <label id="fav-input">Favorite foods: </label>
+        <label id="fav-input-label">Favorite foods: </label>
         <input id="fav-input" type="text" name="fav-foods" class="form-control form-text"
-          placeholder="e.g. 'fish, cashews, garlic'">
+          placeholder="e.g. 'fish, cashews, avocado'" value="{{fav_foods}}">
       </div>
 
       <div class="form-group">
-        <label id="res-input">Diet restrictions: </label>
+        <label id="res-input-label">Diet restrictions: </label>
         <input id="res-input" type="text" name="res-foods" class="form-control form-text"
-          placeholder="e.g. 'milk, shrimp'">
+          placeholder="e.g. 'milk, shrimp'" value="{{omit_foods}}">
       </div>
 
       <div class="form-group">
-        <label id="cal-input">Calorie limit: </label>
-        <input id="cal-input" type="number" name="cal-limit" min=0 max=20000 class="form-control form-num">
+        <label id="cal-input-label">Calorie limit: </label>
+        <input id="cal-input" type="number" name="cal-limit" min=0 max=20000 class="form-control form-num"
+          value="{{cal_limit}}">
       </div>
 
       <div class="form-group">
         <label>Meal recommendations by category: </label>
+        {% if inputs.breakfast_selected %}
+        <input checked type="checkbox" class="form-control form-box form-category" id="b-toggle" name="breakfast">
+        {% else %}
         <input type="checkbox" class="form-control form-box form-category" id="b-toggle" name="breakfast">
-        <label id="b-toggle">Breakfast</label>
+        {% endif %}
+        <label id="b-toggle-label">Breakfast</label>
 
+        {% if inputs.lunch_selected %}
+        <input checked type="checkbox" class="form-control form-box form-category" id="l-toggle" name="lunch">
+        {% else %}
         <input type="checkbox" class="form-control form-box form-category" id="l-toggle" name="lunch">
-        <label id="l-toggle">Lunch</label>
+        {% endif %}
+        <label id="l-toggle-label">Lunch</label>
 
+        {% if inputs.dinner_selected %}
+        <input checked type="checkbox" class="form-control form-box form-category" id="d-toggle" name="dinner">
+        {% else %}
         <input type="checkbox" class="form-control form-box form-category" id="d-toggle" name="dinner">
-        <label id="d-toggle">Dinner</label>
+        {% endif %}
+        <label id="d-toggle-label">Dinner</label>
       </div>
 
       <div class="form-group">
+        {% if inputs.drink_included %}
+        <input checked type="checkbox" class="form-control form-box" id="drink-toggle" name="include-drink">
+        {% else %}
         <input type="checkbox" class="form-control form-box" id="drink-toggle" name="include-drink">
-        <label id="drink-toggle">Include drinks</label>
+        {% endif %}
+        <label id="drink-toggle-label">Include drinks</label>
       </div>
 
       <div class="form-group">
+        <button id="clear-input" type="button" class="btn" onclick="clearInputs()"> Clear input </button>
         <button id="submit" type="submit" class="btn btn-info"> Make meal plan ! </button>
       </div>
 
     </form>
-    <h1>{{output_message}}</h1>
-    <br><br>
+    <br>
+    <!--<h1>{{output_message}}</h1>-->
+    <br>
     <div id="results" class="results-div">
       {% if breakfast_data or lunch_data or dinner_data %}
       {% if breakfast_data %}
@@ -395,13 +442,6 @@
         function displayModal(clickedID) {
           let id_num = clickedID.split("-")[1];
           $("#modal-" + id_num).modal('show');
-        }
-
-        function fixNumbering(directions, id) {
-          let regex = /[0-9]+\./g;
-          let isNumbering = directions.match(regex) != null;
-          if (isNumbering) directions = directions.substring(3).trim();
-          $(id).text(directions);
         }
 
         displayData();
