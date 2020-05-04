@@ -190,7 +190,6 @@
     }
 
     .chosen-choices {
-      height: 35px !important;
       padding: 5px 10px !important;
       font-size: 12px !important;
       line-height: 1.5 !important;
@@ -225,6 +224,10 @@
       $("#l-toggle").prop("checked", false);
       $("#d-toggle").prop("checked", false);
       $("#drink-toggle").prop("checked", false);
+    }
+
+    function checkInputSize() {
+      console.log("Eyyy");
     }
   </script>
 </head>
@@ -375,6 +378,10 @@
       </div>
 
     </form>
+    <script>
+      $(".chosen-select").chosen();
+      $(".chosen-choices").height("24px");
+    </script>
     <br>
     <!--<h1>{{output_message}}</h1>-->
     <br>
@@ -605,11 +612,12 @@
             </ol>
             {% endif %}
             {% endif %}
-            {% if breakfast_item["review"] is not none %}
+            {% if breakfast_item["review"]|length > 0 %}
             <br>
             <h3 class="modal-body-header">Review</h3>
             <p class="underline">_________</p>
             <p>"{{breakfast_item["review"]}}"</p>
+            <br>
             {% endif %}
           </div>
           <div class="modal-footer">
@@ -691,11 +699,12 @@
             </ol>
             {% endif %}
             {% endif %}
-            {% if lunch_item["review"] is not none %}
+            {% if lunch_item["review"]|length > 0 %}
             <br>
             <h3 class="modal-body-header">Review</h3>
             <p class="underline">_________</p>
             <p>"{{lunch_item["review"]}}"</p>
+            <br>
             {% endif %}
           </div>
           <div class="modal-footer">
@@ -777,11 +786,12 @@
             </ol>
             {% endif %}
             {% endif %}
-            {% if dinner_item["review"] is not none %}
+            {% if dinner_item["review"]|length > 0 %}
             <br>
             <h3 class="modal-body-header">Review</h3>
             <p class="underline">_________</p>
             <p>"{{dinner_item["review"]}}"</p>
+            <br>
             {% endif %}
           </div>
           <div class="modal-footer">
@@ -794,8 +804,16 @@
     {% endif %}
   </div>
 </body>
+
 <script>
-  $(".chosen-select").chosen();
+  $(".chosen-drop").click(() => {
+    let numSelected = $("#allergy-input :selected").length;
+    if (numSelected == 6) {
+      $(".chosen-choices").height("55px");
+    } else if (numSelected < 6) {
+      $(".chosen-choices").height("24px");
+    }
+  });
 </script>
 
 </html>
