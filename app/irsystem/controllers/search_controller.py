@@ -179,26 +179,6 @@ def rank_recipes_boolean(fav_foods,omit_foods,inv_idx,rcps):
     return recipes
 
 
-def rank_recipes_boolean_ORNOT(fav_foods,omit_foods,inv_idx,rcps):
-    """ Returns the matching recipes in order of best rating
-        Params: {fav_foods: List of str
-                omit_foods: List of str
-                inv_idx: List of tuples
-                rcps: List of Dicts
-                }
-        Returns: recipes: List of Dicts (any term in favorite foods, no terms in omit_foods)
-    """
-    rec_ids = merge_postings_ANDNOT(combine_AND_boolean_terms(fav_foods,inv_idx), combine_NOT_boolean_terms(omit_foods,inv_idx))
-    if len(rec_ids) == 0:
-        return []
-    recipes = [rcps[i] for i in rec_ids]
-    for r in recipes:
-        if r['rating'] is None or r['rating'] > 5:
-            r['rating'] = 0
-    recipes = sorted(recipes, key=lambda k: k['rating'], reverse=True)
-    return recipes
-
-
 def combine_rank_recipes_ORAND(or_results,fav_foods):
     """ Returns the matching recipes in order of best match
         Params: {fav_foods: List of str

@@ -272,3 +272,26 @@ def filterLinks():
     r.description = desc
     db.session.flush()
     db.session.commit()
+
+
+"""
+Uploads user reviews (if available) for each recipe.
+"""
+def uploadReviews():
+  placeholder = db.session.query(Recipe).filter_by(title="PLACEHOLDER XY").first()
+  if placeholder is not None:
+    return
+  r = Recipe(title="PLACEHOLDER XY")
+  db.session.add(r)
+  db.session.flush()
+  db.session.commit()
+  with open("app/full_format_recipes_wrestrictedreview.json") as f:
+    data = json.loads(f.readlines()[0])
+  for d in data:
+      if "ingredients" in d and "selected_review" in d:
+        ingredients = ";;;".join(d["ingredients"])
+        recipe = db.session.query(Recipe).filter_by(ingredients=ingredients).first()
+        if recipe:
+          recipe.review = d["selected_review"][0]
+          db.session.flush()
+          db.session.commit()

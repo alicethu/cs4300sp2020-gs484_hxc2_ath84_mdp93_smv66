@@ -39,6 +39,7 @@ class Recipe(Base):
     title = Column(String())
     sodium = Column(Float)
     categories = Column(String())
+    review = Column(String())
 
 
 class Category(Base):
@@ -71,5 +72,6 @@ class RecipeSchema(Schema):
             "rating",
             "title",
             "sodium",
-            "categories"
+            "categories",
+            "review"
         )

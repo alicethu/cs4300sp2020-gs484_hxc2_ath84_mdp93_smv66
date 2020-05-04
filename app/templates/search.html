@@ -563,7 +563,7 @@
             or breakfast_item["fat"] is not none or breakfast_item["protein"] 
             is not none or breakfast_item["sodium"] is not none %}
             <h3 class="modal-body-header">Nutritional Information</h3>
-            <p class="underline">____________________________________</p>
+            <p class="underline">__________________________</p>
             {% if breakfast_item["calories"] is not none %}
             <p><strong>Calories:</strong> {{breakfast_item["calories"] | int}}</p>
             {% endif %}
@@ -581,7 +581,7 @@
             {% if breakfast_item["ingredients"] is not none 
             or breakfast_item["directions"] is not none %}
             <h3 class="modal-body-header">Preparation</h3>
-            <p class="underline">_____________________</p>
+            <p class="underline">______________</p>
             {% if breakfast_item["ingredients"] is not none %}
             <p><strong>Ingredients:</strong></p>
             {% set ingredients_lst = breakfast_item["ingredients"].split(';;;') %}
@@ -604,6 +604,12 @@
               {% endfor %}
             </ol>
             {% endif %}
+            {% endif %}
+            {% if breakfast_item["review"] is not none %}
+            <br>
+            <h3 class="modal-body-header">Review</h3>
+            <p class="underline">_________</p>
+            <p>"{{breakfast_item["review"]}}"</p>
             {% endif %}
           </div>
           <div class="modal-footer">
@@ -643,7 +649,7 @@
             or lunch_item["fat"] is not none or lunch_item["protein"] 
             is not none or lunch_item["sodium"] is not none %}
             <h3 class="modal-body-header">Nutritional Information</h3>
-            <p class="underline">____________________________________</p>
+            <p class="underline">__________________________</p>
             {% if lunch_item["calories"] is not none %}
             <p><strong>Calories:</strong> {{lunch_item["calories"] | int}}</p>
             {% endif %}
@@ -661,7 +667,7 @@
             {% if lunch_item["ingredients"] is not none 
             or lunch_item["directions"] is not none %}
             <h3 class="modal-body-header">Preparation</h3>
-            <p class="underline">_____________________</p>
+            <p class="underline">______________</p>
             {% if lunch_item["ingredients"] is not none %}
             <p><strong>Ingredients:</strong></p>
             {% set ingredients_lst = lunch_item["ingredients"].split(';;;') %}
@@ -684,6 +690,12 @@
               {% endfor %}
             </ol>
             {% endif %}
+            {% endif %}
+            {% if lunch_item["review"] is not none %}
+            <br>
+            <h3 class="modal-body-header">Review</h3>
+            <p class="underline">_________</p>
+            <p>"{{lunch_item["review"]}}"</p>
             {% endif %}
           </div>
           <div class="modal-footer">
@@ -723,7 +735,7 @@
             or dinner_item["fat"] is not none or dinner_item["protein"] 
             is not none or dinner_item["sodium"] is not none %}
             <h3 class="modal-body-header">Nutritional Information</h3>
-            <p class="underline">____________________________________</p>
+            <p class="underline">__________________________</p>
             {% if dinner_item["calories"] is not none %}
             <p><strong>Calories:</strong> {{dinner_item["calories"] | int}}</p>
             {% endif %}
@@ -741,7 +753,7 @@
             {% if dinner_item["ingredients"] is not none 
             or dinner_item["directions"] is not none %}
             <h3 class="modal-body-header">Preparation</h3>
-            <p class="underline">_____________________</p>
+            <p class="underline">______________</p>
             {% if dinner_item["ingredients"] is not none %}
             <p><strong>Ingredients:</strong></p>
             {% set ingredients_lst = dinner_item["ingredients"].split(';;;') %}
@@ -764,6 +776,12 @@
               {% endfor %}
             </ol>
             {% endif %}
+            {% endif %}
+            {% if dinner_item["review"] is not none %}
+            <br>
+            <h3 class="modal-body-header">Review</h3>
+            <p class="underline">_________</p>
+            <p>"{{dinner_item["review"]}}"</p>
             {% endif %}
           </div>
           <div class="modal-footer">
