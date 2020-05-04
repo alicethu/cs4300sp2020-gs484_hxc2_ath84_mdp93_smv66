@@ -34,7 +34,7 @@
       font-size: 140%;
       font-weight: bold;
       padding-bottom: 10px;
-      color: rgb(46, 110, 58);
+      color: rgb(17, 80, 29);
     }
 
     .normal-title:hover {
@@ -126,7 +126,6 @@
 
     .fade {
       padding: 20px;
-      /* center align??? */
     }
 
     .modal-backdrop {
@@ -195,8 +194,13 @@
       background-color: rgb(102, 151, 95);
     }
 
+    .btn-default {
+      color: white;
+    }
+
     .btn-default:hover {
       background-color: rgb(102, 151, 95);
+      color: white;
     }
 
     .close {
@@ -249,10 +253,6 @@
       $("#d-toggle").prop("checked", false);
       $("#drink-toggle").prop("checked", false);
     }
-
-    function checkInputSize() {
-      console.log("Eyyy");
-    }
   </script>
 </head>
 
@@ -260,12 +260,6 @@
 
   <div class="background_img"></div>
 
-  <!--
-    <div class="topcorner">
-        <p>Project Name: {{ name }}</p>
-        <p>Student Names: ({{ netid }})</p>
-    </div>
-    -->
   <main>
     <form class="form-inline global-search">
       <a href="/">
@@ -361,7 +355,7 @@
 
       <div class="form-group">
         <label id="cal-input-label">Calorie Limit: </label>
-        <input id="cal-input" type="number" name="cal-limit" min=0 max=20000 class="form-control form-num"
+        <input id="cal-input" type="number" name="cal-limit" min=0 max=20000 step=10 class="form-control form-num"
           value="{{cal_limit}}">
       </div>
 
@@ -406,10 +400,9 @@
     </form>
     <script>
       $(".chosen-select").chosen();
-      $(".chosen-choices").height("24px");
+      $(".chosen-choices").height("31px");
     </script>
     <br>
-    <!--<h1>{{output_message}}</h1>-->
     <br>
     <div id="results" class="results-div">
       {% if breakfast_data or lunch_data or dinner_data %}
@@ -837,7 +830,7 @@
     if (numSelected == 6) {
       $(".chosen-choices").height("55px");
     } else if (numSelected < 6) {
-      $(".chosen-choices").height("24px");
+      $(".chosen-choices").height("31px");
     }
   });
 </script>
