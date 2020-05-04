@@ -544,8 +544,8 @@ def search():
 
             if fav_foods:
                 # basic query splitting
-                fav_foods = fav_foods.lower()
-                query_words = fav_foods.split(",") # accounting for comma-separated queries
+                fav_words = fav_foods.lower()
+                query_words = fav_words.split(",") # accounting for comma-separated queries
                 query_words = [word.strip() for word in query_words]
                 if len(query_words) == 1:
                     query_words = query_words[0].split(";") # accounting for semicolon-separated queries
@@ -565,6 +565,7 @@ def search():
             
             if omit_foods:
                 # basic query splitting
+                omit_words = omit_foods.lower()
                 omit_words = omit_foods.split(",") # accounting for comma-separated queries
                 omit_words = [word.strip() for word in omit_words]
                 if len(omit_words) == 1:
