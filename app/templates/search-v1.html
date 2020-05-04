@@ -32,16 +32,31 @@
             align-content: center;
             text-align: center;
         }
+
+        #versions {
+            position: absolute;
+            top: 1%;
+            left: 2%;
+            font-size: 150%;
+            color: rgb(35, 99, 47);
+            padding: 10px 0px 0px 0px;
+        }
+
+        .version-link {
+            color: rgb(35, 99, 47);
+        }
+
+        .version-link:hover {
+            color: rgb(102, 151, 95);
+        }
     </style>
 </head>
 
 <body>
-    <!--
-    <div class="topcorner">
-        <p>Project Name: {{ name }}</p>
-        <p>Student Names: ({{ netid }})</p>
-    </div>
-    -->
+    <header>
+        <p id="versions"><a class="version-link" href="/?version=2">Version 2</a> | <a class="version-link"
+                href="/">Final Version</a></p>
+    </header>
     <form class="form-inline global-search">
         <h1 style="font-size: 55px; font-family:Futura">
             <span style="color: rgb(15, 110, 35); ">S</span>

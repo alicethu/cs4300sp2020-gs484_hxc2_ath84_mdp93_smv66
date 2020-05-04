@@ -120,19 +120,34 @@
     h5 {
       line-height: 0px;
     }
+
+    #versions {
+      position: absolute;
+      left: 2%;
+      font-size: 150%;
+      color: rgb(35, 99, 47);
+      padding: 10px 0px 0px 0px;
+    }
+
+    .version-link {
+      color: rgb(35, 99, 47);
+    }
+
+    .version-link:hover {
+      color: rgb(102, 151, 95);
+    }
   </style>
 </head>
 
 <body>
 
+  <header>
+    <p id="versions"><a class="version-link" href="/?version=1">Version 1</a> | <a class="version-link" href="/">Final
+        Version</a></p>
+  </header>
+
   <div class="background_img"></div>
 
-  <!--
-    <div class="topcorner">
-        <p>Project Name: {{ name }}</p>
-        <p>Student Names: ({{ netid }})</p>
-    </div>
-    -->
   <main>
     <form class="form-inline global-search">
       <h1 style="font-size: 55px; font-family:Futura">

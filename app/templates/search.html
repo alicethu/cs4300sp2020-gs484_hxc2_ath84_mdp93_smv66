@@ -277,6 +277,22 @@
     .highlighted {
       background-image: linear-gradient(rgb(138, 199, 129) 50%, rgb(138, 199, 129) 100%) !important;
     }
+
+    #versions {
+      position: absolute;
+      left: 2%;
+      font-size: 150%;
+      color: rgb(35, 99, 47);
+      padding: 10px 0px 0px 0px;
+    }
+
+    .version-link {
+      color: rgb(35, 99, 47);
+    }
+
+    .version-link:hover {
+      color: rgb(102, 151, 95);
+    }
   </style>
   <script>
     function clearInputs() {
@@ -289,11 +305,21 @@
       $("#drink-toggle").prop("checked", false);
       $("option").prop("selected", false);
       $(".chosen-select").trigger("chosen:updated");
+      let numSelected = $("#allergy-input :selected").length;
+      if (numSelected == 5) {
+        $(".chosen-choices").height("58px");
+      } else if (numSelected < 5) {
+        $(".chosen-choices").height("31px");
+      }
     }
   </script>
 </head>
 
 <body>
+  <header>
+    <p id="versions"><a class="version-link" href="/?version=1">Version 1</a> | <a class="version-link"
+        href="/?version=2">Version 2</a></p>
+  </header>
 
   <div class="background_img"></div>
 
