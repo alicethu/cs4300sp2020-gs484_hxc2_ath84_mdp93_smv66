@@ -13,6 +13,27 @@ from app.irsystem.models import Recipe, RecipeSchema
 
 recipe_schema = RecipeSchema(many=True)
 
+# defining allergy to associated foods mapping
+allergy_map = {
+    "Dairy": ["butter", "Butter", "cheese", "Cheese", "cream", "Cream", 
+        "custard", "Custard", "milk", "Milk", "whey", "yogurt", 
+        "Yogurt"],
+    "Egg": ["egg", "Egg"],
+    "Fish": ["albacore", "anchov", "Anchov", "carp", "Carp", 
+        "cod", "Cod", "fish", "Fish", "herring", "mackerel", 
+        "pollock", "salmon", "Salmon", "sardine", "tilapia", 
+        "salmon", "Salmon", "trout", "tuna", "Tuna", "yellowfin", "yellowtail"],
+    "Peanut": ["peanut", "Peanut"],
+    "Shellfish": ["clam", "Clam", "crab", "Crab", "crawfish", "Crawfish", 
+        "crayfish", "lobster", "mussel",  "oyster", "Oyster", "prawn", "scallop", "shrimp", 
+        "Shrimp", "squid"],
+    "Soybean": ["soy", "Soy", "soybean", "Soybean", "soy bean"],
+    "Tree Nut": ["almond", "Almond", "cashew", "Cashew", "chestnut", 
+        "Chestnut", "hazelnut", "Hazelnut", "hickory", "macadamia", "pecan", 
+        "Pecan", "pine", "Pine", "pistachio", "Pistachio", "walnut", "Walnut"],
+    "Wheat": ["wheat", "Wheat"]
+}
+
 
 def tokenize(text):
     """Returns a list of words that make up the text.
@@ -418,21 +439,23 @@ Returns a list of recipes such that each recipe...
 and 5) is not categorized as "Drink" if drink_included is None
 """
 def get_recipes_by_OR(m_type, query_words_with_caps, omit_words_with_caps, 
-    cal_limit, drink_included, field_name):
+    cal_limit, drink_included, allergy_lst, field_name):
     recipes = None # temporary initialization
     if field_name == "title":
         if drink_included:
             recipes = Recipe.query.filter(
                         and_(
                             or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
-                            and_(~Recipe.title.like("%{}%".format(word)) for word in omit_words_with_caps)
+                            and_(~Recipe.title.like("%{}%".format(word)) for word in omit_words_with_caps),
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in allergy_lst)
                         )).filter(Recipe.calories <= cal_limit)\
                             .filter_by(meal_type=m_type).all()
         else:
             recipes = Recipe.query.filter(
                         and_(
                             or_(Recipe.title.like("%{}%".format(word)) for word in query_words_with_caps),
-                            and_(~Recipe.title.like("%{}%".format(word)) for word in omit_words_with_caps)
+                            and_(~Recipe.title.like("%{}%".format(word)) for word in omit_words_with_caps),
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in allergy_lst)
                         )).filter(Recipe.calories <= cal_limit)\
                             .filter(~Recipe.categories.like("%Drink%"))\
                                 .filter_by(meal_type=m_type).all()
@@ -441,14 +464,16 @@ def get_recipes_by_OR(m_type, query_words_with_caps, omit_words_with_caps,
             recipes = Recipe.query.filter(
                         and_(
                             or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
-                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in omit_words_with_caps)
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in omit_words_with_caps),
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in allergy_lst)
                         )).filter(Recipe.calories <= cal_limit)\
                             .filter_by(meal_type=m_type).all()
         else:
             recipes = Recipe.query.filter(
                         and_(
                             or_(Recipe.ingredients.like("%{}%".format(word)) for word in query_words_with_caps),
-                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in omit_words_with_caps)
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in omit_words_with_caps),
+                            and_(~Recipe.ingredients.like("%{}%".format(word)) for word in allergy_lst)
                         )).filter(Recipe.calories <= cal_limit)\
                             .filter(~Recipe.categories.like("%Drink%"))\
                                 .filter_by(meal_type=m_type).all()
@@ -467,11 +492,11 @@ def search():
     lunch_selected = request.args.get('lunch')
     dinner_selected = request.args.get('dinner')
     drink_included = request.args.get('include-drink')
+    allergies = request.args.getlist('allergies')
 
     # user input sanitization
     if version is not None and not version.isnumeric():
         version = None
-    # user input sanitization
     if omit_foods:
         omit_foods = html.escape(omit_foods)
     if breakfast_selected:
@@ -482,6 +507,17 @@ def search():
         dinner_selected = html.escape(dinner_selected)
     if drink_included:
         drink_included = html.escape(drink_included)
+    
+    # handling allergy input
+    allergy_lst = []
+    selected_allergies = []
+    if len(allergies) > 0:
+        for i in range(len(allergies)):
+            current = allergies[i]
+            current = html.escape(current)
+            if current in allergy_map:
+                selected_allergies.append(current)
+                allergy_lst += allergy_map[current]
     
     # check if user specifies any meal types or not
     no_meal_type_specified = (breakfast_selected is None 
@@ -556,28 +592,28 @@ def search():
             if breakfast_selected:
                 breakfast_recipes_by_title = get_recipes_by_OR("breakfast",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
-                    drink_included, "title")
+                    drink_included, allergy_lst, "title")
                 breakfast_recipes_by_ingredients = get_recipes_by_OR("breakfast",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
-                    drink_included, "ingredients")
+                    drink_included, allergy_lst, "ingredients")
                 breakfast_data = final_search(query_words, omit_words, 
                     breakfast_recipes_by_title, breakfast_recipes_by_ingredients)
             if lunch_selected:
                 lunch_recipes_by_title = get_recipes_by_OR("lunch",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
-                    drink_included, "title")
+                    drink_included, allergy_lst, "title")
                 lunch_recipes_by_ingredients = get_recipes_by_OR("lunch",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
-                    drink_included, "ingredients")
+                    drink_included, allergy_lst, "ingredients")
                 lunch_data = final_search(query_words, omit_words, 
                     lunch_recipes_by_title, lunch_recipes_by_ingredients)
             if dinner_selected:
                 dinner_recipes_by_title = get_recipes_by_OR("dinner",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
-                    drink_included, "title")
+                    drink_included, allergy_lst, "title")
                 dinner_recipes_by_ingredients = get_recipes_by_OR("dinner",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
-                    drink_included, "ingredients")
+                    drink_included, allergy_lst, "ingredients")
                 dinner_data = final_search(query_words, omit_words, 
                     dinner_recipes_by_title, dinner_recipes_by_ingredients)
             
@@ -589,8 +625,9 @@ def search():
             if not result_success:
                 output_message = "No Results Found:("
         inputs = {"fav_foods": fav_foods, "omit_foods": omit_foods, 
-            "breakfast_selected": breakfast_selected, "lunch_selected": lunch_selected, "dinner_selected": dinner_selected, 
-            "drink_included": drink_included, "cal_limit": cal_limit}
+            "breakfast_selected": breakfast_selected, "lunch_selected": lunch_selected, 
+            "dinner_selected": dinner_selected, "drink_included": drink_included, 
+            "cal_limit": cal_limit, "allergies": selected_allergies}
         if cal_limit == max_calories:
             inputs["cal_limit"] = ""
         if no_meal_type_specified:
