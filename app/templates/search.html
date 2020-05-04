@@ -668,7 +668,7 @@
             </ol>
             {% endif %}
             {% endif %}
-            {% if breakfast_item["review"]|length > 0 %}
+            {% if breakfast_item["review"] is not none and breakfast_item["review"]|length > 0 %}
             <br>
             <h3 class="modal-body-header">Review</h3>
             <p class="underline">_________</p>
@@ -755,7 +755,7 @@
             </ol>
             {% endif %}
             {% endif %}
-            {% if lunch_item["review"]|length > 0 %}
+            {% if lunch_item["review"] is not none and lunch_item["review"]|length > 0 %}
             <br>
             <h3 class="modal-body-header">Review</h3>
             <p class="underline">_________</p>
@@ -842,7 +842,7 @@
             </ol>
             {% endif %}
             {% endif %}
-            {% if dinner_item["review"]|length > 0 %}
+            {% if dinner_item["review"] is not none and dinner_item["review"]|length > 0 %}
             <br>
             <h3 class="modal-body-header">Review</h3>
             <p class="underline">_________</p>
