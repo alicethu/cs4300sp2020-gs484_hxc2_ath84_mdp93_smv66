@@ -390,9 +390,6 @@ def final_search(query_words, omit_words, recipes_by_title, recipes_by_ingredien
     else:
         # boolean search
         recipes_title_out = recipe_schema.dump(recipes_by_title)
-        # inv_idx_ingredients = build_inverted_index(recipes_out, "ingredients")
-        # inv_idx_title = build_inverted_index(recipes_out, "title")
-        # ranked_results = rank_recipes_boolean(query_words, omit_words, inv_idx_title, recipes_out)
         ranked_results = combine_rank_recipes_ORAND(recipes_title_out, query_words)
         if len(ranked_results) < 10:
             recipes_ingredients_out = recipe_schema.dump(recipes_by_ingredients)
@@ -479,16 +476,18 @@ def search():
     # user input sanitization
     if version is not None and not version.isnumeric():
         version = None
+    if fav_foods:
+        fav_foods = html.escape(fav_foods.strip())
     if omit_foods:
-        omit_foods = html.escape(omit_foods)
+        omit_foods = html.escape(omit_foods.strip())
     if breakfast_selected:
-        breakfast_selected = html.escape(breakfast_selected)
+        breakfast_selected = html.escape(breakfast_selected.strip())
     if lunch_selected:
-        lunch_selected = html.escape(lunch_selected)
+        lunch_selected = html.escape(lunch_selected.strip())
     if dinner_selected:
-        dinner_selected = html.escape(dinner_selected)
+        dinner_selected = html.escape(dinner_selected.strip())
     if drink_included:
-        drink_included = html.escape(drink_included)
+        drink_included = html.escape(drink_included.strip())
     
     # handling allergy input
     allergy_lst = []
@@ -529,34 +528,43 @@ def search():
             netid=net_ids, output_message=output_message, breakfast_data=breakfast_data, 
             lunch_data=lunch_data, dinner_data=dinner_data)
     else:
-        if fav_foods:
-            fav_foods = html.escape(fav_foods)
-            output_message = "Your search: " + fav_foods
+        if fav_foods or omit_foods or cal_limit != max_calories \
+            or not no_meal_type_specified or drink_included or len(selected_allergies) > 0:
 
-            # basic query cleaning/splitting 
-            # (TODO: data validation to check SQL injection and possibly input type)
-            fav_foods = fav_foods.lower()
-            query_words = fav_foods.split(",") # accounting for comma-separated queries
-            query_words = [word.strip() for word in query_words]
-            if len(query_words) == 1:
-                query_words = query_words[0].split(";") # accounting for semicolon-separated queries
-            
-            # list of query words, both in original form (as input by user) and capitalized
+            # initializations
+            output_message = "Query successful"
+
+            # list of query/omit words, both in original form (as input by user) and capitalized
             query_words_with_caps = []
-            for word in query_words:
-                multi_word_lst = word.split(" ")
-                multi_word = "" # placeholder initialization
-                if len(multi_word_lst) > 1:
-                    for w in multi_word_lst:
-                        multi_word += w.capitalize() + " "
-                if len(multi_word) > 0:
-                    query_words_with_caps.append(multi_word.strip())
-                query_words_with_caps.append(word)
-                query_words_with_caps.append(word.capitalize())
-            
             omit_words_with_caps = []
-            omit_words = []
+
+            # list of query/omit words, with multi-word inputs split by space
+            query_words_with_spaces = []
+            omit_words_with_spaces = []
+
+            if fav_foods:
+                # basic query splitting
+                fav_foods = fav_foods.lower()
+                query_words = fav_foods.split(",") # accounting for comma-separated queries
+                query_words = [word.strip() for word in query_words]
+                if len(query_words) == 1:
+                    query_words = query_words[0].split(";") # accounting for semicolon-separated queries
+                
+                for word in query_words:
+                    multi_word_lst = word.split(" ")
+                    multi_word = "" # placeholder initialization
+                    for w in multi_word_lst:
+                        query_words_with_spaces.append(w)
+                    if len(multi_word_lst) > 1:
+                        for w in multi_word_lst:
+                            multi_word += w.capitalize() + " "
+                    if len(multi_word) > 0:
+                        query_words_with_caps.append(multi_word.strip())
+                    query_words_with_caps.append(word)
+                    query_words_with_caps.append(word.capitalize())
+            
             if omit_foods:
+                # basic query splitting
                 omit_words = omit_foods.split(",") # accounting for comma-separated queries
                 omit_words = [word.strip() for word in omit_words]
                 if len(omit_words) == 1:
@@ -565,6 +573,8 @@ def search():
                 for word in omit_words:
                     multi_word_lst = word.split(" ")
                     multi_word = "" # placeholder initialization
+                    for w in multi_word_lst:
+                        omit_words_with_spaces.append(w)
                     if len(multi_word_lst) > 1:
                         for w in multi_word_lst:
                             multi_word += w.capitalize() + " "
@@ -585,8 +595,9 @@ def search():
                 breakfast_recipes_by_ingredients = get_recipes_by_OR("breakfast",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
                     drink_included, allergy_lst, "ingredients")
-                breakfast_data = final_search(query_words, omit_words, 
-                    breakfast_recipes_by_title, breakfast_recipes_by_ingredients)
+                breakfast_data = final_search(query_words_with_spaces, 
+                    omit_words_with_spaces, breakfast_recipes_by_title, 
+                    breakfast_recipes_by_ingredients)
             if lunch_selected:
                 lunch_recipes_by_title = get_recipes_by_OR("lunch",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
@@ -594,8 +605,9 @@ def search():
                 lunch_recipes_by_ingredients = get_recipes_by_OR("lunch",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
                     drink_included, allergy_lst, "ingredients")
-                lunch_data = final_search(query_words, omit_words, 
-                    lunch_recipes_by_title, lunch_recipes_by_ingredients)
+                lunch_data = final_search(query_words_with_spaces, 
+                    omit_words_with_spaces, lunch_recipes_by_title, 
+                    lunch_recipes_by_ingredients)
             if dinner_selected:
                 dinner_recipes_by_title = get_recipes_by_OR("dinner",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
@@ -603,9 +615,9 @@ def search():
                 dinner_recipes_by_ingredients = get_recipes_by_OR("dinner",
                     query_words_with_caps, omit_words_with_caps, cal_limit, 
                     drink_included, allergy_lst, "ingredients")
-                dinner_data = final_search(query_words, omit_words, 
-                    dinner_recipes_by_title, dinner_recipes_by_ingredients)
-            
+                dinner_data = final_search(query_words_with_spaces, 
+                    omit_words_with_spaces, dinner_recipes_by_title, 
+                    dinner_recipes_by_ingredients)
             result_success = False
             for data in [breakfast_data, lunch_data, dinner_data]:
                 if data is not None and len(data) > 0:
@@ -623,6 +635,6 @@ def search():
             inputs["breakfast_selected"] = ""
             inputs["lunch_selected"] = ""
             inputs["dinner_selected"] = ""
-        return render_template('search.html', name=project_name, 
-            netid=net_ids, output_message=output_message, breakfast_data=breakfast_data, 
-            lunch_data=lunch_data, dinner_data=dinner_data, inputs=inputs)
+        return render_template('search.html', output_message=output_message, 
+            breakfast_data=breakfast_data, lunch_data=lunch_data, 
+            dinner_data=dinner_data, inputs=inputs)

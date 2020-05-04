@@ -468,6 +468,9 @@
       $(".chosen-choices").height("31px");
     </script>
     <br>
+    {% if output_message == "No Results Found:(" %}
+    <h1>{{ output_message }}</h1>
+    {% endif %}
     <br>
     <div id="results" class="results-div">
       {% if breakfast_data or lunch_data or dinner_data %}
