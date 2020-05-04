@@ -41,6 +41,24 @@
       text-decoration: underline;
     }
 
+    .chosen-container-multi .chosen-choices li.search-choice {
+      background-image: linear-gradient(rgb(138, 199, 129) 50%, rgb(138, 199, 129) 100%) !important;
+      border-radius: 0.9em;
+      border: none !important;
+      padding: 6px 10px;
+      background-size: 100% !important;
+      margin: 2px;
+    }
+
+    .chosen-container-multi .chosen-choices li.search-choice span {
+      padding-right: 12px;
+    }
+
+    .chosen-container-multi .chosen-choices li.search-choice .search-choice-close {
+      margin-top: 2.5px;
+      margin-right: 3px;
+    }
+
     ul li {
       list-style: none;
     }
@@ -86,6 +104,12 @@
       padding: 0px;
       width: 15px;
       height: 15px;
+    }
+
+    .form-center label {
+      display: inline-block;
+      width: 138px;
+      text-align: right;
     }
 
     .hidden {
@@ -164,15 +188,15 @@
     }
 
     .btn {
-      background-color: rgb(138, 199, 129);
+      background-color: rgb(61, 121, 66);
     }
 
     .btn:hover {
-      background-color: rgb(196, 240, 189);
+      background-color: rgb(102, 151, 95);
     }
 
     .btn-default:hover {
-      background-color: rgb(196, 240, 189);
+      background-color: rgb(102, 151, 95);
     }
 
     .close {
@@ -191,7 +215,7 @@
 
     .chosen-choices {
       height: 35px !important;
-      padding: 5px 10px !important;
+      padding: 2px 10px !important;
       font-size: 12px !important;
       line-height: 1.5 !important;
       border-radius: 4px !important;
@@ -272,72 +296,74 @@
       {% set cal_limit = inputs.cal_limit %}
       {% endif %}
 
-      <div class="form-group">
-        <label id="fav-input-label">Favorite ingredients: </label>
-        <input id="fav-input" type="text" name="fav-foods" class="form-control form-text"
-          placeholder="e.g. 'beef, cashews, avocado'" value="{{fav_foods}}">
+      <div class="form-center">
+        <div class="form-group">
+          <label id="fav-input-label">Favorite Ingredients: </label>
+          <input id="fav-input" type="text" name="fav-foods" class="form-control form-text"
+            placeholder="e.g. 'beef, cashews, avocado'" value="{{fav_foods}}">
+        </div>
+
+        <div class="form-group">
+          <label id="res-input-label">Ingredients to Omit: </label>
+          <input id="res-input" type="text" name="res-foods" class="form-control form-text"
+            placeholder="e.g. 'garlic, shrimp'" value="{{omit_foods}}">
+        </div>
+
+        <div class="form-group">
+          <label id="allergy-input-label">Allergies: </label>
+          <select id="allergy-input" multiple class="chosen-select form-control form-text" name="allergies">
+            {% if "Dairy" in inputs.allergies %}
+            <option selected value="Dairy">Dairy</option>
+            {% else %}
+            <option value="Dairy">Dairy</option>
+            {% endif %}
+            {% if "Egg" in inputs.allergies %}
+            <option selected value="Egg">Egg</option>
+            {% else %}
+            <option value="Egg">Egg</option>
+            {% endif %}
+            {% if "Fish" in inputs.allergies %}
+            <option selected value="Fish">Fish</option>
+            {% else %}
+            <option value="Fish">Fish</option>
+            {% endif %}
+            {% if "Peanut" in inputs.allergies %}
+            <option selected value="Peanut">Peanut</option>
+            {% else %}
+            <option value="Peanut">Peanut</option>
+            {% endif %}
+            {% if "Shellfish" in inputs.allergies %}
+            <option selected value="Shellfish">Shellfish</option>
+            {% else %}
+            <option value="Shellfish">Shellfish</option>
+            {% endif %}
+            {% if "Soybean" in inputs.allergies %}
+            <option selected value="Soybean">Soybean</option>
+            {% else %}
+            <option value="Soybean">Soybean</option>
+            {% endif %}
+            {% if "Tree Nut" in inputs.allergies %}
+            <option selected value="Tree Nut">Tree Nut</option>
+            {% else %}
+            <option value="Tree Nut">Tree Nut</option>
+            {% endif %}
+            {% if "Wheat" in inputs.allergies %}
+            <option selected value="Wheat">Wheat</option>
+            {% else %}
+            <option value="Wheat">Wheat</option>
+            {% endif %}
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
-        <label id="res-input-label">Ingredients to omit: </label>
-        <input id="res-input" type="text" name="res-foods" class="form-control form-text"
-          placeholder="e.g. 'garlic, shrimp'" value="{{omit_foods}}">
-      </div>
-
-      <div class="form-group">
-        <label id="allergy-input-label">Allergies: </label>
-        <select id="allergy-input" multiple class="chosen-select form-control form-text" name="allergies">
-          {% if "Dairy" in inputs.allergies %}
-          <option selected value="Dairy">Dairy</option>
-          {% else %}
-          <option value="Dairy">Dairy</option>
-          {% endif %}
-          {% if "Egg" in inputs.allergies %}
-          <option selected value="Egg">Egg</option>
-          {% else %}
-          <option value="Egg">Egg</option>
-          {% endif %}
-          {% if "Fish" in inputs.allergies %}
-          <option selected value="Fish">Fish</option>
-          {% else %}
-          <option value="Fish">Fish</option>
-          {% endif %}
-          {% if "Peanut" in inputs.allergies %}
-          <option selected value="Peanut">Peanut</option>
-          {% else %}
-          <option value="Peanut">Peanut</option>
-          {% endif %}
-          {% if "Shellfish" in inputs.allergies %}
-          <option selected value="Shellfish">Shellfish</option>
-          {% else %}
-          <option value="Shellfish">Shellfish</option>
-          {% endif %}
-          {% if "Soybean" in inputs.allergies %}
-          <option selected value="Soybean">Soybean</option>
-          {% else %}
-          <option value="Soybean">Soybean</option>
-          {% endif %}
-          {% if "Tree Nut" in inputs.allergies %}
-          <option selected value="Tree Nut">Tree Nut</option>
-          {% else %}
-          <option value="Tree Nut">Tree Nut</option>
-          {% endif %}
-          {% if "Wheat" in inputs.allergies %}
-          <option selected value="Wheat">Wheat</option>
-          {% else %}
-          <option value="Wheat">Wheat</option>
-          {% endif %}
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label id="cal-input-label">Calorie limit: </label>
+        <label id="cal-input-label">Calorie Limit: </label>
         <input id="cal-input" type="number" name="cal-limit" min=0 max=20000 class="form-control form-num"
           value="{{cal_limit}}">
       </div>
 
       <div class="form-group">
-        <label>Meal recommendations by category: </label>
+        <label>Mealtime Category: </label>
         {% if inputs.breakfast_selected %}
         <input checked type="checkbox" class="form-control form-box form-category" id="b-toggle" name="breakfast">
         {% else %}
