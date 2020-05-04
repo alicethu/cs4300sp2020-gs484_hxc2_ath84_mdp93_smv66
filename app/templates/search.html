@@ -287,6 +287,8 @@
       $("#l-toggle").prop("checked", false);
       $("#d-toggle").prop("checked", false);
       $("#drink-toggle").prop("checked", false);
+      $("option").prop("selected", false);
+      $(".chosen-select").trigger("chosen:updated");
     }
   </script>
 </head>
@@ -862,11 +864,11 @@
 </body>
 
 <script>
-  $(".chosen-drop").click(() => {
+  $(".chosen-select").chosen().change(() => {
     let numSelected = $("#allergy-input :selected").length;
-    if (numSelected == 6) {
-      $(".chosen-choices").height("55px");
-    } else if (numSelected < 6) {
+    if (numSelected == 5) {
+      $(".chosen-choices").height("58px");
+    } else if (numSelected < 5) {
       $(".chosen-choices").height("31px");
     }
   });

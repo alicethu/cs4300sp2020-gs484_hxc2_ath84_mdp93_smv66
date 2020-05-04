@@ -15,9 +15,11 @@ recipe_schema = RecipeSchema(many=True)
 
 # defining allergy to associated foods mapping
 allergy_map = {
-    "Dairy": ["butter", "Butter", "cheese", "Cheese", "cream", "Cream", 
-        "custard", "Custard", "milk", "Milk", "whey", "yogurt", 
-        "Yogurt"],
+    "Dairy": ["brie", "Brie", "butter", "Butter", "cheddar", "Cheddar", "cheese", 
+        "Cheese", "cream", "Cream", "custard", "Custard", "feta", "Feta", "milk", 
+        "Milk", "mozzarella", "Mozzarella", "parmesan", "Parmesan", "Parmigiano", 
+        "parmigiano", "provolone", "Provolone", "ricotta", "Ricotta", "whey", 
+        "yogurt", "Yogurt"],
     "Egg": ["egg", "Egg"],
     "Fish": ["albacore", "anchov", "Anchov", "carp", "Carp", 
         "cod", "Cod", "fish", "Fish", "herring", "mackerel", 
@@ -561,6 +563,13 @@ def search():
                     omit_words = omit_words[0].split(";") # accounting for semicolon-separated queries
 
                 for word in omit_words:
+                    multi_word_lst = word.split(" ")
+                    multi_word = "" # placeholder initialization
+                    if len(multi_word_lst) > 1:
+                        for w in multi_word_lst:
+                            multi_word += w.capitalize() + " "
+                    if len(multi_word) > 0:
+                        omit_words_with_caps.append(multi_word.strip())
                     omit_words_with_caps.append(word)
                     omit_words_with_caps.append(word.capitalize())
 
