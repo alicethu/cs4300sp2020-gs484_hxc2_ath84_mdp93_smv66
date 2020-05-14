@@ -96,7 +96,8 @@
     }
 
     .global-search .form-num {
-      width: 100px;
+      width: 80px;
+      margin: 0px 16px 0px 2px;
     }
 
     .global-search .form-box {
@@ -126,18 +127,12 @@
 
     .calories-container {
       margin-right: 73px;
+      margin-left: 34px;
     }
 
     .chosen-container span {
       font-size: 14px !important;
     }
-
-    /* 
-    .form-center input,
-    .form-center select,
-    .chosen-container .chosen-results li {
-      width: 400px !important;
-    } */
 
     .hidden {
       display: none;
@@ -190,14 +185,6 @@
       background: rgb(237, 218, 199);
       padding: 15px 100px;
     }
-
-    /* .form-box-background {
-      background: rgba(199, 181, 163, 0.8);
-      padding-top: 30px;
-      padding-bottom: 50px;
-      width: 57%;
-      border: rgb(199, 181, 163);
-    } */
 
     .modal-body p,
     .modal-body ul li,
@@ -299,6 +286,8 @@
       $("#fav-input").val("");
       $("#res-input").val("");
       $("#cal-input").val("");
+      $("#fat-input").val("");
+      $("#sodium-input").val("");
       $("#b-toggle").prop("checked", false);
       $("#l-toggle").prop("checked", false);
       $("#d-toggle").prop("checked", false);
@@ -354,6 +343,8 @@
       {% set fav_foods = inputs.fav_foods %}
       {% set omit_foods = inputs.omit_foods %}
       {% set cal_limit = inputs.cal_limit %}
+      {% set fat_limit = inputs.fat_limit %}
+      {% set sodium_limit = inputs.sodium_limit %}
       {% endif %}
 
       <div class="form-box-background">
@@ -422,6 +413,14 @@
           <label id="cal-input-label">Calorie Limit: </label>
           <input id="cal-input" type="number" name="cal-limit" min=0 max=20000 class="form-control form-num"
             value="{{cal_limit}}">
+
+          <label id="fat-input-label">Fat Limit (g): </label>
+          <input id="fat-input" type="number" name="fat-limit" min=0 max=400 class="form-control form-num"
+            value="{{fat_limit}}">
+
+          <label id="sodium-input-label">Sodium Limit (mg): </label>
+          <input id="sodium-input" type="number" name="sodium-limit" min=0 max=5000 class="form-control form-num"
+            value="{{sodium_limit}}">
         </div>
 
         <div class="form-group">
